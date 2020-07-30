@@ -24,6 +24,10 @@ inputs:
     description: 'Install packages after installation through pacman'
     required: false
     default: false
+  bitness:
+    description: 'Bitness of MSYS2: 32 or 64 (advanced users only)'
+    required: false
+    default: '64'
 runs:
   using: 'node12'
   main: 'index.js'

@@ -10,7 +10,9 @@ const assert = require('assert').strict;
 const { hashElement } = require('folder-hash');
 
 const inst_url = 'https://github.com/msys2/msys2-installer/releases/download/2020-07-19/msys2-base-x86_64-20200719.sfx.exe';
+const inst32_url = 'https://github.com/jeremyd2019/msys2-installer/releases/download/2020-05-17/msys2-base-i686-20200517.sfx.exe';
 const checksum = '7abf59641c8216baf9be192a2072c041fffafc41328bac68f13f0e87c0baa1d3';
+const checksum32 = '5c4d29f1b1ec4a2754bfa563c350eb4b120069ef0ced3a58885a67ca269431f0';
 
 function changeGroup(str) {
   core.endGroup();
@@ -23,6 +25,7 @@ function parseInput() {
   let p_pathtype = core.getInput('path-type');
   let p_msystem = core.getInput('msystem');
   let p_install = core.getInput('install');
+  let p_bitness = core.getInput('bitness');
 
   const msystem_allowed = ['MSYS', 'MINGW32', 'MINGW64'];
   if (!msystem_allowed.includes(p_msystem.toUpperCase())) {
@@ -38,15 +41,22 @@ function parseInput() {
     pathtype: p_pathtype,
     msystem: p_msystem,
     install: p_install,
+    bitness: p_bitness,
   }
 }
 
-async function downloadInstaller(destination) {
-  await tc.downloadTool(inst_url, destination);
+async function downloadInstaller(destination, input) {
+  let url = inst_url;
+  let chksum = checksum;
+  if (input.bitness === "32") {
+    url = inst32_url;
+    chksum = checksum32;
+  }
+  await tc.downloadTool(url, destination);
   let computedChecksum = '';
   await exec.exec(`powershell.exe`, [`(Get-FileHash ${destination} -Algorithm SHA256)[0].Hash`], {listeners: {stdout: (data) => { computedChecksum += data.toString(); }}});
-  if (computedChecksum.slice(0, -2).toUpperCase() !== checksum.toUpperCase()) {
-    throw new Error(`The SHA256 of the installer does not match! expected ${checksum} got ${computedChecksum}`);
+  if (computedChecksum.slice(0, -2).toUpperCase() !== chksum.toUpperCase()) {
+    throw new Error(`The SHA256 of the installer does not match! expected ${chksum} got ${computedChecksum}`);
   }
 }
 
@@ -99,7 +109,7 @@ class PackageCache {
     // We want a cache key that is ideally always the same for the same kind of job.
     // So that mingw32 and ming64 jobs, and jobs with different install packages have different caches.
     let shasum = crypto.createHash('sha1');
-    shasum.update([input.release, input.update, input.pathtype, input.msystem, input.install].toString());
+    shasum.update([input.release, input.update, input.pathtype, input.msystem, input.install, input.bitness].toString());
     this.jobCacheKey = this.fallbackCacheKey + '-conf:' + shasum.digest('hex').slice(0, 8);
 
     this.restoreKey = undefined;
@@ -203,7 +213,7 @@ async function run() {
     let msysRootDir = path.join('C:', 'msys64');
     if (input.release) {
       // Use upstream package instead of the default installation in the virtual environment.
-      msysRootDir = path.join(dest, 'msys64');
+      msysRootDir = path.join(dest, `msys${input.bitness}`);
 
       instCache = new InstallCache(msysRootDir, input);
       core.startGroup('Restoring environment...');
@@ -213,7 +223,7 @@ async function run() {
       if (!cachedInstall) {
         core.startGroup('Downloading MSYS2...');
         let inst_dest = path.join(tmp_dir, 'base.exe');
-        await downloadInstaller(inst_dest);
+        await downloadInstaller(inst_dest, input);
 
         changeGroup('Extracting MSYS2...');
         await exec.exec(inst_dest, ['-y'], {cwd: dest});
