@@ -149,6 +149,7 @@ jobs:
       max-parallel: 3
       matrix:
         msystem: [ MSYS, MINGW64, MINGW32 ]
+        bitness: [ 64, 32 ]
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v2
@@ -160,6 +161,7 @@ jobs:
       with:
         update: true
         msystem: ${{ matrix.msystem }}
+        bitness: ${{ matrix.bitness }}
     - run: msys2 ./test.sh ${{ matrix.msystem }}
 
   MSYS2_PATH_TYPE:
