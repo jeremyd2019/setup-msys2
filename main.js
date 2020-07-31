@@ -289,6 +289,14 @@ async function run() {
       core.endGroup();
     }
 
+    if (input.bitness === "32") {
+      core.startGroup('Killing remaining tasks...');
+      await exec.exec('taskkill', ['/F', '/FI', 'MODULES eq msys-2.0.dll']);
+      changeGroup('autorebase.bat...');
+      await exec.exec(path.join(msysRootDir, "autorebase.bat"));
+      core.endGroup();
+    }
+
     if (!cachedInstall) {
       core.startGroup('Saving package cache...');
       await packageCache.prune();
