@@ -28,6 +28,9 @@ inputs:
     description: 'Bitness of MSYS2: 32 or 64 (advanced users only)'
     required: false
     default: '64'
+outputs:
+  msysRootDir:
+    description: 'Path to the MSYS root'
 runs:
   using: 'node12'
   main: 'index.js'
