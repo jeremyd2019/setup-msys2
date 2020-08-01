@@ -192,6 +192,16 @@ async function pacman(args, opts) {
   await runMsys(['pacman', '--noconfirm'].concat(args), opts);
 }
 
+async function killMsysProcs(input) {
+  if (input.bitness === "32" && process.env['PROCESSOR_ARCHITECTURE'] !== "x86") {
+    // taskkill doesn't work on 32-bit processes on 64-bit windows
+    await exec.exec(path.join(process.env['windir'], "SysWOW64", "WindowsPowerShell", "v1.0", "PowerShell.exe"), ["-NoProfile", "-ExecutionPolicy", "Bypass", "-Command", "Get-Process | Where-Object { $_.Modules.ModuleName -contains 'msys-2.0.dll' } | Stop-Process -Force"]);
+  } else {
+    await exec.exec('taskkill', ['/F', '/FI', 'MODULES eq msys-2.0.dll']);
+  }
+}
+
+
 async function run() {
   try {
     if (process.platform !== 'win32') {
@@ -278,7 +288,7 @@ async function run() {
         await runMsys(['sed', '-i', 's/^#\\(IgnorePkg\\s*\\)=/\\1 = msys2-keyring/', '/etc/pacman.conf']);
       }
       changeGroup('Killing remaining tasks...');
-      await exec.exec('taskkill', ['/F', '/FI', 'MODULES eq msys-2.0.dll']);
+      await killMsysProcs(input);
       changeGroup('Final system upgrade...');
       await pacman(['-Suu', '--overwrite', '*'], {});
       core.endGroup();
@@ -292,7 +302,7 @@ async function run() {
 
     if (input.bitness === "32") {
       core.startGroup('Killing remaining tasks...');
-      await exec.exec('taskkill', ['/F', '/FI', 'MODULES eq msys-2.0.dll']);
+      await killMsysProcs(input);
       changeGroup('autorebase.bat...');
       await exec.exec(path.join(msysRootDir, "autorebase.bat"));
       core.endGroup();
