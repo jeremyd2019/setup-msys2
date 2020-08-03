@@ -246,7 +246,6 @@ async function run() {
       }
     }
 
-    core.setOutput("msysRootDir", msysRootDir);
     writeWrapper(msysRootDir, input.pathtype, dest, 'msys2.cmd');
     core.addPath(dest);
 
