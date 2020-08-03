@@ -10,11 +10,9 @@ const assert = require('assert').strict;
 const { hashElement } = require('folder-hash');
 
 const inst_url = 'https://github.com/msys2/msys2-installer/releases/download/2020-07-19/msys2-base-x86_64-20200719.sfx.exe';
-const inst32_url = 'https://github.com/jeremyd2019/msys2-installer/releases/download/2020-05-17/msys2-base-i686-20200517.sfx.exe';
-const keyring_pkg = 'msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz';
-const keyring_url = 'https://repo.msys2.org/msys/x86_64/' + keyring_pkg;
+const inst32_url = 'https://github.com/jeremyd2019/msys2-installer/releases/download/2020-08-03-base32/msys2-base-i686-20200803.sfx.exe';
 const checksum = '7abf59641c8216baf9be192a2072c041fffafc41328bac68f13f0e87c0baa1d3';
-const checksum32 = '5c4d29f1b1ec4a2754bfa563c350eb4b120069ef0ced3a58885a67ca269431f0';
+const checksum32 = 'e0e883fedc098af0da1488b2c21411db1d40bc2c33d0ed2e6361a319cc30ba4a';
 
 function changeGroup(str) {
   core.endGroup();
@@ -246,7 +244,6 @@ async function run() {
       }
     }
 
-    core.setOutput("msysRootDir", msysRootDir);
     writeWrapper(msysRootDir, input.pathtype, dest, 'msys2.cmd');
     core.addPath(dest);
 
@@ -268,25 +265,11 @@ async function run() {
       core.startGroup('Disable CheckSpace...');
       // Reduce time required to install packages by disabling pacman's disk space checking
       await runMsys(['sed', '-i', 's/^CheckSpace/#CheckSpace/g', '/etc/pacman.conf']);
-      if (input.bitness === "32" && !cachedInstall) {
-        changeGroup('Downloading new keyring...');
-        await tc.downloadTool(keyring_url, path.join(msysRootDir, keyring_pkg));
-        await tc.downloadTool(keyring_url+".sig", path.join(msysRootDir, keyring_pkg+".sig"));
-        changeGroup('Verifying new keyring...');
-        await runMsys(['pacman-key', '--verify', '/' + keyring_pkg + ".sig", '/' + keyring_pkg]);
-        changeGroup('Installing new keyring...');
-        await pacman(['-U', '--overwrite', '*', '/' + keyring_pkg]);
-        changeGroup('Ignoring keyring pkgs...');
-        await runMsys(['sed', '-i', 's/^#\\(IgnorePkg\\s*\\)=/\\1 = msys2-keyring/', '/etc/pacman.conf']);
-      }
       changeGroup('Updating packages...');
       await pacman(['-Syuu', '--overwrite', '*'], {ignoreReturnCode: true});
       // We have changed /etc/pacman.conf above which means on a pacman upgrade
       // pacman.conf will be installed as pacman.conf.pacnew
       await runMsys(['mv', '-f', '/etc/pacman.conf.pacnew', '/etc/pacman.conf'], {ignoreReturnCode: true, silent: true});
-      if (input.bitness === "32") {
-        await runMsys(['sed', '-i', 's/^#\\(IgnorePkg\\s*\\)=/\\1 = msys2-keyring/', '/etc/pacman.conf']);
-      }
       changeGroup('Killing remaining tasks...');
       await killMsysProcs(input);
       changeGroup('Final system upgrade...');
