@@ -275,17 +275,12 @@ async function run() {
         await runMsys(['pacman-key', '--verify', '/' + keyring_pkg + ".sig", '/' + keyring_pkg]);
         changeGroup('Installing new keyring...');
         await pacman(['-U', '--overwrite', '*', '/' + keyring_pkg]);
-        changeGroup('Ignoring keyring pkgs...');
-        await runMsys(['sed', '-i', 's/^#\\(IgnorePkg\\s*\\)=/\\1 = msys2-keyring/', '/etc/pacman.conf']);
       }
       changeGroup('Updating packages...');
       await pacman(['-Syuu', '--overwrite', '*'], {ignoreReturnCode: true});
       // We have changed /etc/pacman.conf above which means on a pacman upgrade
       // pacman.conf will be installed as pacman.conf.pacnew
       await runMsys(['mv', '-f', '/etc/pacman.conf.pacnew', '/etc/pacman.conf'], {ignoreReturnCode: true, silent: true});
-      if (input.bitness === "32") {
-        await runMsys(['sed', '-i', 's/^#\\(IgnorePkg\\s*\\)=/\\1 = msys2-keyring/', '/etc/pacman.conf']);
-      }
       changeGroup('Killing remaining tasks...');
       await killMsysProcs(input);
       changeGroup('Final system upgrade...');
