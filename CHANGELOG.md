@@ -1,8 +1,29 @@
 # Changelog
 
-## [Unreleased](https://github.com/msys2/setup-msys2/compare/654f62ffd14ab50887ad19e09b1ae277fc1f538c...HEAD)
+## [Unreleased](https://github.com/msys2/setup-msys2/compare/46faddb10578f4ed77e9db446a5077f6c980041a...HEAD)
 
 *None*
+
+## [2.1.1](https://github.com/msys2/setup-msys2/compare/72120a5f5986349f2babced564e027a96001c99a...46faddb10578f4ed77e9db446a5077f6c980041a) - 2020/10/05
+
+### Changed
+
+- Bump dependencies:
+  - @actions/core to v1.2.6
+  - eslint to v7.10.0
+  - folder-bash to v3.3.3
+
+## [2.1.0](https://github.com/msys2/setup-msys2/compare/654f62ffd14ab50887ad19e09b1ae277fc1f538c...72120a5f5986349f2babced564e027a96001c99a) - 2020/09/04
+
+### Changed
+
+- Update base distribution to [20200903](https://github.com/msys2/msys2-installer/releases/tag/2020-09-03). [[#66](https://github.com/msys2/setup-msys2/pull/66)]
+- Conditionally disable the install cache, unset by default. [[#63](https://github.com/msys2/setup-msys2/pull/63)]
+- Switch dependabot interval from 'daily' to 'weekly'.
+- Bump dependencies:
+  - @actions/cache to v1.0.2
+  - @actions/core to v1.2.5
+  - eslint to v7.7.0
 
 ## [2.0.1](https://github.com/msys2/setup-msys2/compare/0908a2926547f3a4fa10a13a11156a09e3cdd8a4...654f62ffd14ab50887ad19e09b1ae277fc1f538c) - 2020/07/27
 
@@ -13,12 +34,12 @@
 
 ### Changed
 
-- Refactor code into multiple functions. [#53](https://github.com/msys2/setup-msys2/pull/53)
-- Cache the whole installation when possible. [#54](https://github.com/msys2/setup-msys2/pull/54)
+- Refactor code into multiple functions. [[#53](https://github.com/msys2/setup-msys2/pull/53)]
+- Cache the whole installation when possible. [[#54](https://github.com/msys2/setup-msys2/pull/54)]
 - `pacman`:
-  - Always pass `--overwrite '*'`. [#55](https://github.com/msys2/setup-msys2/pull/55)
-  - Handle upgrade creating `.pacnew` files. [#56](https://github.com/msys2/setup-msys2/pull/56)
-- CI: only build the action once. [#57](https://github.com/msys2/setup-msys2/pull/57)
+  - Always pass `--overwrite '*'`. [[#55](https://github.com/msys2/setup-msys2/pull/55)]
+  - Handle upgrade creating `.pacnew` files. [[#56](https://github.com/msys2/setup-msys2/pull/56)]
+- CI: only build the action once. [[#57](https://github.com/msys2/setup-msys2/pull/57)]
 - Dependencies:
   - Bump @actions/cache to v1.0.1
   - Fix: @actions/tool-cache should not be pinned

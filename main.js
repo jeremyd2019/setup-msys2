@@ -9,11 +9,13 @@ const crypto = require('crypto');
 const assert = require('assert').strict;
 const { hashElement } = require('folder-hash');
 
-const inst_url = 'https://github.com/msys2/msys2-installer/releases/download/2020-07-19/msys2-base-x86_64-20200719.sfx.exe';
+const inst_url = 'https://github.com/msys2/msys2-installer/releases/download/2020-09-03/msys2-base-x86_64-20200903.sfx.exe';
+const checksum = '44823b94d7ac7309bd246dd78bab966e5bb342225ea229ac6769ba708edcfc1c';
+// see https://github.com/msys2/setup-msys2/issues/61
+const INSTALL_CACHE_ENABLED = false;
 const inst32_url = 'https://github.com/jeremyd2019/msys2-installer/releases/download/2020-05-17/msys2-base-i686-20200517.sfx.exe';
 const keyring_pkg = 'msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz';
 const keyring_url = 'https://repo.msys2.org/msys/x86_64/' + keyring_pkg;
-const checksum = '7abf59641c8216baf9be192a2072c041fffafc41328bac68f13f0e87c0baa1d3';
 const checksum32 = '5c4d29f1b1ec4a2754bfa563c350eb4b120069ef0ced3a58885a67ca269431f0';
 
 function changeGroup(str) {
@@ -111,7 +113,7 @@ class PackageCache {
     // We want a cache key that is ideally always the same for the same kind of job.
     // So that mingw32 and ming64 jobs, and jobs with different install packages have different caches.
     let shasum = crypto.createHash('sha1');
-    shasum.update([input.release, input.update, input.pathtype, input.msystem, input.install, input.bitness].toString());
+    shasum.update([input.release, input.update, input.pathtype, input.msystem, input.install, input.bitness].toString() + checksum);
     this.jobCacheKey = this.fallbackCacheKey + '-conf:' + shasum.digest('hex').slice(0, 8);
 
     this.restoreKey = undefined;
@@ -227,10 +229,12 @@ async function run() {
       // Use upstream package instead of the default installation in the virtual environment.
       msysRootDir = path.join(dest, `msys${input.bitness}`);
 
-      instCache = new InstallCache(msysRootDir, input);
-      core.startGroup('Restoring environment...');
-      cachedInstall = await instCache.restore();
-      core.endGroup();
+      if (INSTALL_CACHE_ENABLED) {
+        instCache = new InstallCache(msysRootDir, input);
+        core.startGroup('Restoring environment...');
+        cachedInstall = await instCache.restore();
+        core.endGroup();
+      }
 
       if (!cachedInstall) {
         core.startGroup('Downloading MSYS2...');
@@ -310,8 +314,7 @@ async function run() {
       core.endGroup();
     }
 
-    if (input.release) {
-      assert.ok(instCache);
+    if (instCache !== null) {
       core.startGroup('Saving environment...');
       await packageCache.clear();
       await instCache.save();
