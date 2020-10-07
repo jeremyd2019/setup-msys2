@@ -277,6 +277,9 @@ async function run() {
       changeGroup('Killing remaining tasks...');
       await killMsysProcs(input);
       changeGroup('Final system upgrade...');
+      if (input.bitness === "32" && !cachedInstall) {
+        await pacman(['-S', '--needed', '--overwrite', '*', 'pacman-contrib']);
+      }
       await pacman(['-Suu', '--overwrite', '*'], {});
       core.endGroup();
     }
