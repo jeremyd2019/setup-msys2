@@ -1,8 +1,18 @@
 # Changelog
 
-## [Unreleased](https://github.com/msys2/setup-msys2/compare/46faddb10578f4ed77e9db446a5077f6c980041a...HEAD)
+## [Unreleased](https://github.com/msys2/setup-msys2/compare/bd0bdf22fe90699697c5c2b4bc1cc842bd4e1a5f...HEAD)
 
 *None*
+
+## [2.1.1](https://github.com/msys2/setup-msys2/compare/46faddb10578f4ed77e9db446a5077f6c980041a...bd0bdf22fe90699697c5c2b4bc1cc842bd4e1a5f) - 2020/11/14
+
+### Changed
+
+- Update base distribution to [20201109](https://github.com/msys2/msys2-installer/releases/tag/2020-11-09).
+- Bump dependencies:
+  - @actions/cache to v1.0.4
+  - eslint to v7.13.0
+  - folder-hash to v4.0.0
 
 ## [2.1.1](https://github.com/msys2/setup-msys2/compare/72120a5f5986349f2babced564e027a96001c99a...46faddb10578f4ed77e9db446a5077f6c980041a) - 2020/10/05
 
