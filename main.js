@@ -9,12 +9,13 @@ const crypto = require('crypto');
 const assert = require('assert').strict;
 const { hashElement } = require('folder-hash');
 
-const inst_url = 'https://github.com/msys2/msys2-installer/releases/download/2020-11-09/msys2-base-x86_64-20201109.sfx.exe';
-const checksum = 'f8a05b9353c42735521f393497dbbd0ce4db1a9de79ee1f6ef224bc9fae144b7';
+const inst_url = 'https://github.com/msys2/msys2-installer/releases/download/2021-06-04/msys2-base-x86_64-20210604.sfx.exe';
+const checksum = '2d7bdb926239ec2afaca8f9b506b34638c3cd5d18ee0f5d8cd6525bf80fcab5d';
 // see https://github.com/msys2/setup-msys2/issues/61
 const INSTALL_CACHE_ENABLED = false;
-const inst32_url = 'https://github.com/jeremyd2019/msys2-installer/releases/download/2020-08-03-base32/msys2-base-i686-20200803.sfx.exe';
-const checksum32 = 'e0e883fedc098af0da1488b2c21411db1d40bc2c33d0ed2e6361a319cc30ba4a';
+const CACHE_FLUSH_COUNTER = 0;
+const inst32_url = 'https://github.com/jeremyd2019/msys2-installer/releases/download/2021-07-04-build32/msys2-base-i686-20210704.sfx.exe';
+const checksum32 = 'd91b6f9e2a168e22dacb120cd53e6a4f02d7a763f545014e411016d9c58dda65';
 
 function changeGroup(str) {
   core.endGroup();
@@ -29,13 +30,13 @@ function parseInput() {
   let p_install = core.getInput('install');
   let p_bitness = core.getInput('bitness');
 
-  const msystem_allowed = ['MSYS', 'MINGW32', 'MINGW64'];
+  const msystem_allowed = ['MSYS', 'MINGW32', 'MINGW64', 'UCRT64', 'CLANG32', 'CLANG64'];
   if (!msystem_allowed.includes(p_msystem.toUpperCase())) {
     throw new Error(`'msystem' needs to be one of ${ msystem_allowed.join(', ') }, got ${p_msystem}`);
   }
   p_msystem = p_msystem.toUpperCase()
 
-  p_install = (p_install === 'false') ? [] : p_install.split(' ');
+  p_install = (p_install === 'false') ? [] : p_install.split(/\s+/);
 
   return {
     release: p_release,
@@ -111,7 +112,7 @@ class PackageCache {
     // We want a cache key that is ideally always the same for the same kind of job.
     // So that mingw32 and ming64 jobs, and jobs with different install packages have different caches.
     let shasum = crypto.createHash('sha1');
-    shasum.update([input.release, input.update, input.pathtype, input.msystem, input.install, input.bitness].toString() + (input.bitness === "32" ? checksum32 : checksum));
+    shasum.update([CACHE_FLUSH_COUNTER, input.release, input.update, input.pathtype, input.msystem, input.install, input.bitness].toString() + (input.bitness === "32" ? checksum32 : checksum));
     this.jobCacheKey = this.fallbackCacheKey + '-conf:' + shasum.digest('hex').slice(0, 8);
 
     this.restoreKey = undefined;
@@ -251,8 +252,6 @@ async function run() {
     writeWrapper(msysRootDir, input.pathtype, dest, 'msys2.cmd');
     core.addPath(dest);
 
-    core.exportVariable('MSYSTEM', input.msystem);
-
     const packageCache = new PackageCache(msysRootDir, input);
 
     if (!cachedInstall) {
@@ -277,7 +276,7 @@ async function run() {
       changeGroup('Killing remaining tasks...');
       await killMsysProcs(input);
       changeGroup('Final system upgrade...');
-      await pacman(['-Suu', '--overwrite', '*'], {});
+      await pacman(['-Syuu', '--overwrite', '*'], {});
       core.endGroup();
     }
 
@@ -294,6 +293,8 @@ async function run() {
       await exec.exec(path.join(msysRootDir, "autorebase.bat"));
       core.endGroup();
     }
+
+    core.exportVariable('MSYSTEM', input.msystem);
 
     if (!cachedInstall) {
       core.startGroup('Saving package cache...');

@@ -10,11 +10,32 @@
 
 # Setup MSYS2
 
-[MSYS2](https://www.msys2.org/) is available by default in [windows-latest](https://github.com/actions/virtual-environments/blob/master/images/win/Windows2019-Readme.md#msys2) virtual environment for GitHub Actions. However, the default installation is updated every ~10 days, and it includes some pre-installed packages. As a result, startup time can be up to 10 min. Moreover, MSYS2/MINGW are neither added to the PATH nor available as a custom `shell` option.
+**setup-msys2** is a JavaScript GitHub Action (GHA) to setup an [MSYS2](https://www.msys2.org/) environment (i.e. MSYS,
+MINGW32, MINGW64, UCRT64, CLANG32, and/or CLANG64 shells) using the GHA [toolkit](https://github.com/actions/toolkit) for
+automatic caching.
 
-**setup-msys2** is a JavaScript GitHub Action (GHA) to optionally setup an up-to-date and stable [MSYS2](https://www.msys2.org/) environment in a temporal location, using the GHA [toolkit](https://github.com/actions/toolkit). Moreover, it provides a custom entrypoint.
+## Context
 
-If option `release` is `false`, the default installation is used. Otherwise (by default), the latest tarball available at [repo.msys2.org/distrib/x86_64](http://repo.msys2.org/distrib/x86_64/) is downloaded and extracted.
+[MSYS2](https://www.msys2.org/) is available by default in [windows-latest](https://github.com/actions/virtual-environments/blob/master/images/win/Windows2019-Readme.md#msys2)
+[virtual environment](https://github.com/actions/virtual-environments) for GitHub Actions, located at `C:\msys64`.
+Moreover, there is work in progress for making `bash` default to MSYS2 (see [actions/virtual-environments#1525](https://github.com/actions/virtual-environments/issues/1525)).
+However, the default installation has some caveats at the moment (see [actions/virtual-environments#1572](https://github.com/actions/virtual-environments/issues/1572)):
+
+- It is updated every ~10 days.
+- It includes a non-negligible set of pre-installed packages. As a result, update time can be up to 10 min.
+- Caching of installation packages is not supported.
+- MSYS2/MINGW are neither added to the PATH nor available as a custom `shell` option.
+
+**setup-msys2** works around those constraints:
+
+- Using option `release: false`, the default installation is used, but automatic caching is supported and a custom
+entrypoint is provided.
+- By default (`release: true`), **setup-msys2** downloads and extracts the latest tarball available at [repo.msys2.org/distrib/x86_64](http://repo.msys2.org/distrib/x86_64/),
+a clean and up-to-date environment is set up in a temporary location, and a custom entrypoint (`msys2`) is provided.
+Hence, the overhead of updating pre-installed but unnecessary packages is avoided.
+
+Therefore, usage of this Action is recommended to all MSYS2 users of GitHub Actions, since caching and the custom
+entrypoint are provided regardless of option `release`.
 
 ## Usage
 
@@ -30,7 +51,8 @@ Then, for scripts:
       uname -a
 ```
 
-It is also possible to execute specific commands from cmd/powershell scripts/snippets. In order to do so, `-c` is required:
+It is also possible to execute specific commands from cmd/powershell scripts/snippets.
+In order to do so, `-c` is required:
 
 ```yaml
   - shell: powershell
@@ -54,29 +76,38 @@ In order to reduce verbosity, it is possible to set `msys2` as the default shell
   - uses: msys2/setup-msys2@v2
     with:
       update: true
-      install: base-devel git
+      install: >-
+        base-devel
+        git
   #- run: git config --global core.autocrlf input
   #  shell: bash
   - uses: actions/checkout@v2
   - run: git describe --dirty
 ```
 
-Note that setting `autocrlf` is required in specific use cases only. See [actions/checkout#250](https://github.com/actions/checkout/issues/250).
+Note that setting `autocrlf` is required in specific use cases only.
+See [actions/checkout#250](https://github.com/actions/checkout/issues/250).
 
 ### Build matrix
 
-It is common to test some package/tool on MINGW32 (32 bit) and MINGW64 (64 bit), which typically requires installing different sets of packages through option `install`. GitHub Actions' `strategy` and `matrix` fields allow to do so, as explained in [docs.github.com: Configuring a build matrix](https://docs.github.com/en/actions/configuring-and-managing-workflows/configuring-a-workflow#configuring-a-build-matrix) and [docs.github.com: `jobs.<job_id>.strategy.matrix`](https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idstrategymatrix). See, for example:
+It is common to test some package/tool on MINGW32 (32 bit) and MINGW64 (64 bit), which typically requires installing
+different sets of packages through option `install`.
+GitHub Actions' `strategy` and `matrix` fields allow to do so, as explained in [docs.github.com: Configuring a build matrix](https://docs.github.com/en/actions/configuring-and-managing-workflows/configuring-a-workflow#configuring-a-build-matrix)
+and [docs.github.com: `jobs.<job_id>.strategy.matrix`](https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idstrategymatrix).
+See, for example:
 
 - [msys2/MINGW-packages: .github/workflows/main.yml](https://github.com/msys2/MINGW-packages/blob/master/.github/workflows/main.yml).
 - [ghdl/ghdl: .github/workflows/push.yml](https://github.com/ghdl/ghdl/blob/99b542c849311c92e87e2c70d283de133c9d4093/.github/workflows/push.yml#L56-L102).
 
-Find further details at [#40](https://github.com/msys2/setup-msys2/issues/40).
+Find further details at [#40](https://github.com/msys2/setup-msys2/issues/40) and [#102](https://github.com/msys2/setup-msys2/issues/102).
 
 ### Options
 
 #### msystem
 
-By default, `MSYSTEM` is set to `MINGW64`. However, an optional parameter named `msystem` is supported, which expects `MSYS`, `MINGW64` or `MINGW32`. For example:
+By default, `MSYSTEM` is set to `MINGW64`. However, an optional parameter named `msystem` is supported, which expects
+`MSYS`, `MINGW64`, `MINGW32`, `UCRT64`, `CLANG32` or `CLANG64`.
+For example:
 
 ```yaml
   - uses: msys2/setup-msys2@v2
@@ -84,7 +115,9 @@ By default, `MSYSTEM` is set to `MINGW64`. However, an optional parameter named 
       msystem: MSYS
 ```
 
-Furthermore, the environment variable can be overridden. This is useful when multiple commands need to be executed in different contexts. For example, in order to build a PKGBUILD file and then test the installed artifact:
+Furthermore, the environment variable can be overridden.
+This is useful when multiple commands need to be executed in different contexts.
+For example, in order to build a PKGBUILD file and then test the installed artifact:
 
 ```yaml
   - uses: msys2/setup-msys2@v2
@@ -101,10 +134,12 @@ Furthermore, the environment variable can be overridden. This is useful when mul
 
 #### path-type
 
-Defines which parts of the Windows `$env:PATH` environment variable leak into the MSYS2 environment. Allowed values:
+Defines which parts of the Windows `$env:PATH` environment variable leak into the MSYS2 environment.
+Allowed values:
 
 - `strict`: do not inherit anything from `$env:PATH`.
-- `minimal` *(default)*: only inherit the default Windows paths from `$env:PATH` (so that `cmd.exe` and `powershell.exe` are available for example).
+- `minimal` *(default)*: only inherit the default Windows paths from `$env:PATH` (so that `cmd.exe` and `powershell.exe`
+  are available for example).
 - `inherit`: inherit everything; warning: this can lead to interference with other tools installed on the system.
 
 ```yaml
@@ -113,11 +148,14 @@ Defines which parts of the Windows `$env:PATH` environment variable leak into th
       path-type: minimal
 ```
 
-This option corresponds to the `MSYS2_PATH_TYPE` setting in MSYS2; hence it can be set per step through `env`. See [msys2/MSYS2-packages: filesystem/profile](https://github.com/msys2/MSYS2-packages/blob/915946a637e1f2b7e26e32782f3af322009293db/filesystem/profile#L28-L45) for further details about the configuration of each option.
+This option corresponds to the `MSYS2_PATH_TYPE` setting in MSYS2; hence it can be set per step through `env`.
+See [msys2/MSYS2-packages: filesystem/profile](https://github.com/msys2/MSYS2-packages/blob/915946a637e1f2b7e26e32782f3af322009293db/filesystem/profile#L28-L45)
+for further details about the configuration of each option.
 
 #### release
 
-By default (`true`), retrieve and extract base installation from upstream GitHub Releases. If set to `false`, the installation available in the virtual environment is used:
+By default (`true`), retrieve and extract base installation from upstream GitHub Releases.
+If set to `false`, the installation available in the virtual environment is used:
 
 ```yaml
   - uses: msys2/setup-msys2@v2
@@ -127,7 +165,8 @@ By default (`true`), retrieve and extract base installation from upstream GitHub
 
 #### update
 
-By default, the installation is not updated; hence package versions are those of the installation tarball. By setting option `update` to `true`, the action will try to update the runtime and packages cleanly:
+By default, the installation is not updated; hence package versions are those of the installation tarball.
+By setting option `update` to `true`, the action will try to update the runtime and packages cleanly:
 
 ```yaml
   - uses: msys2/setup-msys2@v2
@@ -137,45 +176,14 @@ By default, the installation is not updated; hence package versions are those of
 
 #### install
 
-Installing additional packages after updating the system is supported through option `install`. The package or list of packages are installed through `pacman --noconfirm -S --needed`.
+Installing additional packages after updating the system is supported through option `install`.
+The package or list of packages are installed through `pacman --noconfirm -S --needed`.
 
 ```yaml
   - uses: msys2/setup-msys2@v2
     with:
       update: true
-      install: 'git base-devel'
+      install: >-
+        git
+        base-devel
 ```
-
-## Development
-
-The steps to publish a new release are the following:
-
-```sh
-# Remove/clean dir 'dist'
-rm -rf dist
-
-# Package the action with ncc
-yarn pkg
-
-# - Copy release artifacts to subdir dir
-# - Create a new orphan branch in a new empty repo
-# - Push the branch
-./release.sh v2.x.x
-
-# Fetch the new branch and checkout it
-git fetch --all
-git checkout -b tmp origin/v2.x.x
-
-# Reset the 'rolling' tag to the just released branch
-git tag -d v2
-git tag v2
-git push origin +v2
-
-# Remove the temporal branch
-git checkout master
-git branch -D tmp
-```
-
-> NOTE: although it feels unidiomatic having 'rolling' tags and/or storing release assets in specific branches, it is the recommended solution. Retrieving assets from GitHub Releases is not supported by GitHub Actions (yet). See [actions/javascript-action: Create a release branch](https://github.com/actions/javascript-action#create-a-release-branch), [actions/toolkit: docs/action-versioning.md](https://github.com/actions/toolkit/blob/master/docs/action-versioning.md) and [actions/toolkit#214](https://github.com/actions/toolkit/issues/214).
-
-> NOTE: tag `tag-for-git-describe` is used for testing `git describe --dirty --tags` in CI. See [actions/checkout#250](https://github.com/actions/checkout/issues/250).

@@ -1,10 +1,97 @@
 # Changelog
 
-## [Unreleased](https://github.com/msys2/setup-msys2/compare/bd0bdf22fe90699697c5c2b4bc1cc842bd4e1a5f...HEAD)
+## [Unreleased](https://github.com/msys2/setup-msys2/compare/c381b3e3bb2726b3263ecb5a7204b2ba19f3fc10...HEAD)
 
-*None*
+### Changed
 
-## [2.1.1](https://github.com/msys2/setup-msys2/compare/46faddb10578f4ed77e9db446a5077f6c980041a...bd0bdf22fe90699697c5c2b4bc1cc842bd4e1a5f) - 2020/11/14
+- Bump dependencies:
+  - eslint to v7.29.0
+
+## [2.4.0](https://github.com/msys2/setup-msys2/compare/28da3da2173118160b7ebf24f4f170f30f00cc5e...c381b3e3bb2726b3263ecb5a7204b2ba19f3fc10) - 2021/06/16
+
+### Added
+
+- Support CLANG32 system too. [[#143](https://github.com/msys2/setup-msys2/issues/143)]
+
+### Changed
+
+- Bump dependencies:
+  - eslint to v7.28.0
+
+## [2.3.1](https://github.com/msys2/setup-msys2/compare/1dffee870e9df3fac027dfa450c30a6ee18d7a80...28da3da2173118160b7ebf24f4f170f30f00cc5e) - 2021/06/07
+
+### Changed
+
+- Update base distribution to [20210604](https://github.com/msys2/msys2-installer/releases/tag/2021-06-04). [[#141](https://github.com/msys2/setup-msys2/pull/141)]
+- Bump dependencies:
+  - @actions/core to v1.3.0
+  - @actions/tool-cache to v1.7.0
+  - @vercel/ncc to v0.28.6
+  - eslint to v7.27.0
+
+## [2.3.0](https://github.com/msys2/setup-msys2/compare/78d2b743f702aad2fd3040417b6747b3f342eb66...1dffee870e9df3fac027dfa450c30a6ee18d7a80) - 2021/05/11
+
+### Added
+
+- Support CLANG64 system too. [[#135](https://github.com/msys2/setup-msys2/issues/135)]
+
+## [2.2.0](https://github.com/msys2/setup-msys2/compare/c59fdfa7c5bcce581e57856d9ad73804c6786f2e...78d2b743f702aad2fd3040417b6747b3f342eb66) - 2021/04/20
+
+### Added
+
+- Support UCRT64 system too. [[#130](https://github.com/msys2/setup-msys2/pull/130)]
+
+### Changed
+
+- Update base distribution to [20210419](https://github.com/msys2/msys2-installer/releases/tag/2021-04-19). [[#129](https://github.com/msys2/setup-msys2/pull/129)]
+- Bump dependencies:
+  - @actions/core to v1.2.7
+  - @actions/cache to v1.0.7
+  - @vercel/ncc to v0.28.3
+  - eslint to v7.24.0
+
+## [2.1.6](https://github.com/msys2/setup-msys2/compare/42cc92da65286e00a692258fd5d7bb4624eb5b05...c59fdfa7c5bcce581e57856d9ad73804c6786f2e) - 2021/03/26
+
+### Changed
+
+- Refresh the DBs before the final upgrade. [[#119](https://github.com/msys2/setup-msys2/pull/119), [#120](https://github.com/msys2/setup-msys2/pull/120)]
+- Bump dependencies:
+  - eslint to v7.22.0
+  - folder-hash to v4.0.1
+
+## [2.1.5](https://github.com/msys2/setup-msys2/compare/e7846a8b67444fb87744a711404045b782e7ff63...42cc92da65286e00a692258fd5d7bb4624eb5b05) - 2021/02/28
+
+### Changed
+
+- Update base distribution to [20210228](https://github.com/msys2/msys2-installer/releases/tag/2021-02-28). [[#114](https://github.com/msys2/setup-msys2/pull/114)]
+
+## [2.1.4](https://github.com/msys2/setup-msys2/compare/4d3b22f79f56c4983da648b6b9bfa63815481610...e7846a8b67444fb87744a711404045b782e7ff63) - 2021/02/15
+
+### Changed
+
+- Fix splitting list of 'install' when items are separated by multiple spaces. [[#103](https://github.com/msys2/setup-msys2/issues/103)]
+- Update base distribution to [20210215](https://github.com/msys2/msys2-installer/releases/tag/2021-02-15). [[#112](https://github.com/msys2/setup-msys2/pull/112)]
+- Dependencies:
+  - Bump @actions/cache to v1.0.6
+  - Bump eslint to v7.20.0
+  - @zeit/ncc is no longer maintained; @vercel/ncc v0.27.0 is used instead
+
+## [2.1.3](https://github.com/msys2/setup-msys2/compare/bd0bdf22fe90699697c5c2b4bc1cc842bd4e1a5f...4d3b22f79f56c4983da648b6b9bfa63815481610) - 2021/01/06
+
+### Changed
+
+- Add `CACHE_FLUSH_COUNTER` to CacheKey hash computation, for allowing flushing all the caches by bumping the Action. [[#99](https://github.com/msys2/setup-msys2/issues/99)]
+- Update base distribution to [20210105](https://github.com/msys2/msys2-installer/releases/tag/2021-01-05). [[#101](https://github.com/msys2/setup-msys2/pull/101)]
+- README:
+  - Add section 'Context'. [[#88](https://github.com/msys2/setup-msys2/pull/88)]
+  - Update the syntax for the install list (use fold+strip). [[#90](https://github.com/msys2/setup-msys2/issues/90)]
+  - Move developer related docs into a separate file (`HACKING.md`).
+- Bump dependencies:
+  - @actions/cache to v1.0.5
+  - @actions/tool-cache to v1.6.1
+  - eslint to v7.17.0
+
+## [2.1.2](https://github.com/msys2/setup-msys2/compare/46faddb10578f4ed77e9db446a5077f6c980041a...bd0bdf22fe90699697c5c2b4bc1cc842bd4e1a5f) - 2020/11/14
 
 ### Changed
 
