@@ -9,10 +9,11 @@ const crypto = require('crypto');
 const assert = require('assert').strict;
 const { hashElement } = require('folder-hash');
 
-const inst_url = 'https://github.com/msys2/msys2-installer/releases/download/2020-11-09/msys2-base-x86_64-20201109.sfx.exe';
-const checksum = 'f8a05b9353c42735521f393497dbbd0ce4db1a9de79ee1f6ef224bc9fae144b7';
+const inst_url = 'https://github.com/msys2/msys2-installer/releases/download/2021-06-04/msys2-base-x86_64-20210604.sfx.exe';
+const checksum = '2d7bdb926239ec2afaca8f9b506b34638c3cd5d18ee0f5d8cd6525bf80fcab5d';
 // see https://github.com/msys2/setup-msys2/issues/61
 const INSTALL_CACHE_ENABLED = false;
+const CACHE_FLUSH_COUNTER = 0;
 const inst32_url = 'https://github.com/jeremyd2019/msys2-installer/releases/download/2020-05-17/msys2-base-i686-20200517.sfx.exe';
 const keyring_pkg = 'msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz';
 const keyring_url = 'https://repo.msys2.org/msys/x86_64/' + keyring_pkg;
@@ -31,13 +32,13 @@ function parseInput() {
   let p_install = core.getInput('install');
   let p_bitness = core.getInput('bitness');
 
-  const msystem_allowed = ['MSYS', 'MINGW32', 'MINGW64'];
+  const msystem_allowed = ['MSYS', 'MINGW32', 'MINGW64', 'UCRT64', 'CLANG32', 'CLANG64'];
   if (!msystem_allowed.includes(p_msystem.toUpperCase())) {
     throw new Error(`'msystem' needs to be one of ${ msystem_allowed.join(', ') }, got ${p_msystem}`);
   }
   p_msystem = p_msystem.toUpperCase()
 
-  p_install = (p_install === 'false') ? [] : p_install.split(' ');
+  p_install = (p_install === 'false') ? [] : p_install.split(/\s+/);
 
   return {
     release: p_release,
@@ -113,7 +114,7 @@ class PackageCache {
     // We want a cache key that is ideally always the same for the same kind of job.
     // So that mingw32 and ming64 jobs, and jobs with different install packages have different caches.
     let shasum = crypto.createHash('sha1');
-    shasum.update([input.release, input.update, input.pathtype, input.msystem, input.install, input.bitness].toString() + (input.bitness === "32" ? checksum32 : checksum));
+    shasum.update([CACHE_FLUSH_COUNTER, input.release, input.update, input.pathtype, input.msystem, input.install, input.bitness].toString() + (input.bitness === "32" ? checksum32 : checksum));
     this.jobCacheKey = this.fallbackCacheKey + '-conf:' + shasum.digest('hex').slice(0, 8);
 
     this.restoreKey = undefined;
@@ -288,10 +289,10 @@ async function run() {
       changeGroup('Killing remaining tasks...');
       await killMsysProcs(input);
       changeGroup('Final system upgrade...');
+      await pacman(['-Syuu', '--overwrite', '*'], {});
       if (input.bitness === "32" && !cachedInstall) {
         await pacman(['-S', '--needed', '--overwrite', '*', 'pacman-contrib']);
       }
-      await pacman(['-Suu', '--overwrite', '*'], {});
       core.endGroup();
     }
 
