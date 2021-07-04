@@ -254,8 +254,6 @@ async function run() {
     writeWrapper(msysRootDir, input.pathtype, dest, 'msys2.cmd');
     core.addPath(dest);
 
-    core.exportVariable('MSYSTEM', input.msystem);
-
     const packageCache = new PackageCache(msysRootDir, input);
 
     if (!cachedInstall) {
@@ -309,6 +307,8 @@ async function run() {
       await exec.exec(path.join(msysRootDir, "autorebase.bat"));
       core.endGroup();
     }
+
+    core.exportVariable('MSYSTEM', input.msystem);
 
     if (!cachedInstall) {
       core.startGroup('Saving package cache...');
