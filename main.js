@@ -14,10 +14,8 @@ const checksum = '2d7bdb926239ec2afaca8f9b506b34638c3cd5d18ee0f5d8cd6525bf80fcab
 // see https://github.com/msys2/setup-msys2/issues/61
 const INSTALL_CACHE_ENABLED = false;
 const CACHE_FLUSH_COUNTER = 0;
-const inst32_url = 'https://github.com/jeremyd2019/msys2-installer/releases/download/2020-05-17/msys2-base-i686-20200517.sfx.exe';
-const keyring_pkg = 'msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz';
-const keyring_url = 'https://repo.msys2.org/msys/x86_64/' + keyring_pkg;
-const checksum32 = '5c4d29f1b1ec4a2754bfa563c350eb4b120069ef0ced3a58885a67ca269431f0';
+const inst32_url = 'https://github.com/msys2/msys2-installer/releases/download/nightly-i686/msys2-base-i686-20210705.sfx.exe';
+const checksum32 = '29b4c44b3f65bc0b496b8a9753bdebdc7ec61935db0d3dd09d89f1659e763d05';
 
 function changeGroup(str) {
   core.endGroup();
@@ -270,15 +268,6 @@ async function run() {
       core.startGroup('Disable CheckSpace...');
       // Reduce time required to install packages by disabling pacman's disk space checking
       await runMsys(['sed', '-i', 's/^CheckSpace/#CheckSpace/g', '/etc/pacman.conf']);
-      if (input.bitness === "32" && !cachedInstall) {
-        changeGroup('Downloading new keyring...');
-        await tc.downloadTool(keyring_url, path.join(msysRootDir, keyring_pkg));
-        await tc.downloadTool(keyring_url+".sig", path.join(msysRootDir, keyring_pkg+".sig"));
-        changeGroup('Verifying new keyring...');
-        await runMsys(['pacman-key', '--verify', '/' + keyring_pkg + ".sig", '/' + keyring_pkg]);
-        changeGroup('Installing new keyring...');
-        await pacman(['-U', '--overwrite', '*', '/' + keyring_pkg]);
-      }
       changeGroup('Updating packages...');
       await pacman(['-Syuu', '--overwrite', '*'], {ignoreReturnCode: true});
       // We have changed /etc/pacman.conf above which means on a pacman upgrade
@@ -288,9 +277,6 @@ async function run() {
       await killMsysProcs(input);
       changeGroup('Final system upgrade...');
       await pacman(['-Syuu', '--overwrite', '*'], {});
-      if (input.bitness === "32" && !cachedInstall) {
-        await pacman(['-S', '--needed', '--overwrite', '*', 'pacman-contrib']);
-      }
       core.endGroup();
     }
 
