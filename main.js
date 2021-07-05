@@ -223,7 +223,7 @@ async function run() {
 
     let cachedInstall = false;
     let instCache = null;
-    let msysRootDir = path.join('C:', 'msys64');
+    let msysRootDir = path.join('C:', `msys${input.bitness}`);
     if (input.release) {
       // Use upstream package instead of the default installation in the virtual environment.
       msysRootDir = path.join(dest, `msys${input.bitness}`);
