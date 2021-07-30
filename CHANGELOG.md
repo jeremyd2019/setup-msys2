@@ -1,6 +1,25 @@
 # Changelog
 
-## [Unreleased](https://github.com/msys2/setup-msys2/compare/c381b3e3bb2726b3263ecb5a7204b2ba19f3fc10...HEAD)
+## [Unreleased](https://github.com/msys2/setup-msys2/compare/5f027e0ad12b5d8cf6e794847cec272f9d59825c...HEAD)
+
+*None*
+
+## [2.4.2](https://github.com/msys2/setup-msys2/compare/2ffbfd30567f4031016002fcb5a6e6e7c0de067a...5f027e0ad12b5d8cf6e794847cec272f9d59825c) - 2021/07/30
+
+### Changed
+
+- Update base distribution to [20210725](https://github.com/msys2/msys2-installer/releases/tag/2021-07-25). [[#154](https://github.com/msys2/setup-msys2/pull/154)]
+- Force date into a semver-compliant version. [[#148](https://github.com/msys2/setup-msys2/pull/148)]
+- Add examples. [[#149](https://github.com/msys2/setup-msys2/pull/149)]
+- Bump dependencies:
+  - @vercel/ncc to v0.29.0
+  - eslint to v7.31.0
+
+## [2.4.1](https://github.com/msys2/setup-msys2/compare/c381b3e3bb2726b3263ecb5a7204b2ba19f3fc10...2ffbfd30567f4031016002fcb5a6e6e7c0de067a) - 2021/07/06
+
+### Added
+
+- Cache installer in the tool cache. [[#147](https://github.com/msys2/setup-msys2/pull/147)]
 
 ### Changed
 
