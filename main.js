@@ -228,15 +228,12 @@ async function run() {
 
     const input = parseInput();
 
-    const dest = path.join(tmp_dir, 'msys');
-    await io.mkdirP(dest);
-
     let cachedInstall = false;
     let instCache = null;
     let msysRootDir = path.join('C:', `msys${input.bitness}`);
     if (input.release) {
       // Use upstream package instead of the default installation in the virtual environment.
-      msysRootDir = path.join(dest, `msys${input.bitness}`);
+      msysRootDir = path.join(tmp_dir, `msys${input.bitness}`);
 
       if (INSTALL_CACHE_ENABLED) {
         instCache = new InstallCache(msysRootDir, input);
@@ -250,7 +247,7 @@ async function run() {
         let inst_dest = await downloadInstaller(input);
 
         changeGroup('Extracting MSYS2...');
-        await exec.exec(inst_dest, ['-y'], {cwd: dest});
+        await exec.exec(inst_dest, ['-y'], {cwd: tmp_dir});
 
         changeGroup('Disable Key Refresh...');
         await disableKeyRefresh(msysRootDir);
@@ -258,8 +255,10 @@ async function run() {
       }
     }
 
-    writeWrapper(msysRootDir, input.pathtype, dest, 'msys2.cmd');
-    core.addPath(dest);
+    const pathDir = path.join(tmp_dir, 'setup-msys2');
+    await io.mkdirP(pathDir);
+    writeWrapper(msysRootDir, input.pathtype, pathDir, 'msys2.cmd');
+    core.addPath(pathDir);
 
     const packageCache = new PackageCache(msysRootDir, input);
 
