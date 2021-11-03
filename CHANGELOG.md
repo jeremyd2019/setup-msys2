@@ -1,8 +1,14 @@
 # Changelog
 
-## [Unreleased](https://github.com/msys2/setup-msys2/compare/d7eeada078b00988a612156b15f6bb92c8f29e6c...HEAD)
+## [Unreleased](https://github.com/msys2/setup-msys2/compare/a5dfcea55d4fe86ab2bdc6289102ba2da5a74744...HEAD)
 
 *None*
+
+## [2.6.1](https://github.com/msys2/setup-msys2/compare/d7eeada078b00988a612156b15f6bb92c8f29e6c...a5dfcea55d4fe86ab2bdc6289102ba2da5a74744) - 2021/11/03
+
+### Changed
+
+- location: mkdirP msysRootDir before using it. [[#174](https://github.com/msys2/setup-msys2/pull/174)]
 
 ## [2.6.0](https://github.com/msys2/setup-msys2/compare/a3cc4d82700448fea6cb3bcfc9cbb23f916762c4...d7eeada078b00988a612156b15f6bb92c8f29e6c) - 2021/11/03
 

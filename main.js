@@ -258,6 +258,7 @@ async function run() {
       // Use upstream package instead of the default installation in the virtual environment.
       let dest = (input.location) ? input.location : tmp_dir;
       msysRootDir = path.join(dest, `msys${input.bitness}`);
+      await io.mkdirP(msysRootDir);
 
       if (INSTALL_CACHE_ENABLED) {
         instCache = new InstallCache(msysRootDir, input);
