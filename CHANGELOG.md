@@ -1,10 +1,28 @@
 # Changelog
 
-## [Unreleased](https://github.com/msys2/setup-msys2/compare/5f027e0ad12b5d8cf6e794847cec272f9d59825c...HEAD)
+## [Unreleased](https://github.com/msys2/setup-msys2/compare/d7eeada078b00988a612156b15f6bb92c8f29e6c...HEAD)
+
+*None*
+
+## [2.6.0](https://github.com/msys2/setup-msys2/compare/a3cc4d82700448fea6cb3bcfc9cbb23f916762c4...d7eeada078b00988a612156b15f6bb92c8f29e6c) - 2021/11/03
+
+### Added
+
+- Options:
+  - `platform-check-severity`. [[#172](https://github.com/msys2/setup-msys2/pull/172)]
+  - `location`. [[#173](https://github.com/msys2/setup-msys2/pull/173)]
+  - `pacboy`. [[#166](https://github.com/msys2/setup-msys2/pull/166)]
 
 ### Changed
 
-- Try to shorten the release install path a bit [[#163](https://github.com/msys2/setup-msys2/pull/163)]
+- Bump dependencies:
+  - eslint to v8.1.0
+
+## [2.5.0](https://github.com/msys2/setup-msys2/compare/5f027e0ad12b5d8cf6e794847cec272f9d59825c...a3cc4d82700448fea6cb3bcfc9cbb23f916762c4) - 2021/10/13
+
+### Changed
+
+- Try to shorten the release install path a bit. [[#163](https://github.com/msys2/setup-msys2/pull/163)]
 - Bump dependencies:
   - @actions/core to v1.6.0
   - @vercel/ncc to v0.31.0
