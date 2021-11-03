@@ -172,6 +172,7 @@ jobs:
   msystem:
     needs: [cache]
     strategy:
+      fail-fast: false
       matrix:
         task: [ MSYS, MINGW64, MINGW32, UCRT64, CLANG32, CLANG64 ]
         bitness: [ 64, 32 ]
@@ -193,7 +194,6 @@ jobs:
     needs: [cache]
     strategy:
       fail-fast: false
-      max-parallel: 3
       matrix:
         msystem: [ MSYS, MINGW64, MINGW32, UCRT64, CLANG32, CLANG64 ]
         bitness: [ 64, 32 ]
@@ -248,7 +248,6 @@ jobs:
     needs: [cache]
     strategy:
       fail-fast: false
-      max-parallel: 3
       matrix:
         install: [ false, git, 'base-devel git' ]
     runs-on: windows-latest
@@ -264,6 +263,53 @@ jobs:
         install: ${{ matrix.install }}
         msystem: MINGW64
     - run: msys2 ./test.sh MINGW64
+
+  install-and-pacboy:
+    needs: [cache]
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        msystem: [ MINGW64, MINGW32, UCRT64, CLANG64 ]
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/download-artifact@v2
+      with:
+        name: action
+    - name: run action
+      uses: ./
+      with:
+        msystem: ${{ matrix.msystem }}
+        update: true
+        install: git
+        pacboy: openssl:p
+    - shell: msys2 {0}
+      run: |
+        uname -a
+        openssl help
+
+  pacboy:
+    needs: [cache]
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        msystem: [ MINGW64, MINGW32, UCRT64, CLANG64 ]
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/download-artifact@v2
+      with:
+        name: action
+    - name: run action
+      uses: ./
+      with:
+        msystem: ${{ matrix.msystem }}
+        update: true
+        pacboy: openssl:p
+    - shell: msys2 {0}
+      run: |
+        uname -a
+        openssl help
 
 
   defaultclean:
@@ -361,3 +407,39 @@ jobs:
     - shell: msys2 {0}
       run: |
         uname -a
+
+
+  platformchecks:
+    needs: [cache]
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [ macos, ubuntu ]
+    runs-on: ${{ matrix.platform }}-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/download-artifact@v2
+      with:
+        name: action
+    - name: run action
+      uses: ./
+      with:
+        platform-check-severity: warn
+
+
+  location:
+    needs: [cache]
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/download-artifact@v2
+      with:
+        name: action
+    - name: run action
+      uses: ./
+      with:
+        location: 'D:\'
+        update: false
+    - shell: msys2 {0}
+      run: |
+        cygpath -m /

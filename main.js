@@ -31,6 +31,9 @@ function parseInput() {
   let p_msystem = core.getInput('msystem');
   let p_install = core.getInput('install');
   let p_bitness = core.getInput('bitness');
+  let p_pacboy = core.getInput('pacboy');
+  let p_platformcheckseverity = core.getInput('platform-check-severity');
+  let p_location = core.getInput('location');
 
   const msystem_allowed = ['MSYS', 'MINGW32', 'MINGW64', 'UCRT64', 'CLANG32', 'CLANG64'];
   if (!msystem_allowed.includes(p_msystem.toUpperCase())) {
@@ -39,6 +42,18 @@ function parseInput() {
   p_msystem = p_msystem.toUpperCase()
 
   p_install = (p_install === 'false') ? [] : p_install.split(/\s+/);
+  p_pacboy = (p_pacboy === 'false') ? [] : p_pacboy.split(/\s+/);
+
+  const platformcheckseverity_allowed = ['fatal', 'warn'];
+  if (!platformcheckseverity_allowed.includes(p_platformcheckseverity)) {
+    throw new Error(`'platform-check-severity' needs to be one of ${ platformcheckseverity_allowed.join(', ') }, got ${p_platformcheckseverity}`);
+  }
+
+  if ( process.platform === 'win32' && (p_location === 'C:\\' || p_location === 'C:') ) {
+    throw new Error(`'location' cannot be 'C:' because that contains the built-in MSYS2 installation
+      in GitHub Actions environments. See option 'release', in order to use that installation:
+      https://github.com/msys2/setup-msys2#release`);
+  }
 
   return {
     release: p_release,
@@ -47,6 +62,9 @@ function parseInput() {
     msystem: p_msystem,
     install: p_install,
     bitness: p_bitness,
+    pacboy: p_pacboy,
+    platformcheckseverity: p_platformcheckseverity,
+    location: (p_location == "RUNNER_TEMP") ? process.env['RUNNER_TEMP'] : p_location,
   }
 }
 
@@ -199,8 +217,8 @@ async function runMsys(args, opts) {
   await exec.exec('cmd', ['/D', '/S', '/C', cmd].concat(['-c', quotedArgs.join(' ')]), opts);
 }
 
-async function pacman(args, opts) {
-  await runMsys(['pacman', '--noconfirm'].concat(args), opts);
+async function pacman(args, opts, cmd) {
+  await runMsys([cmd ? cmd : 'pacman', '--noconfirm'].concat(args), opts);
 }
 
 async function killMsysProcs(input) {
@@ -215,8 +233,15 @@ async function killMsysProcs(input) {
 
 async function run() {
   try {
+    const input = parseInput();
+
     if (process.platform !== 'win32') {
-      core.setFailed("MSYS2 does not work on non-windows platforms; please check the 'runs-on' field of the job");
+      const msg = "MSYS2 does not work on non-windows platforms; please check the 'runs-on' field of the job"
+      if (input.platformcheckseverity === 'fatal') {
+        core.setFailed(msg);
+      } else {
+        console.log(msg);
+      }
       return;
     }
 
@@ -226,14 +251,13 @@ async function run() {
       return;
     }
 
-    const input = parseInput();
-
     let cachedInstall = false;
     let instCache = null;
     let msysRootDir = path.join('C:', `msys${input.bitness}`);
     if (input.release) {
       // Use upstream package instead of the default installation in the virtual environment.
-      msysRootDir = path.join(tmp_dir, `msys${input.bitness}`);
+      let dest = (input.location) ? input.location : tmp_dir;
+      msysRootDir = path.join(dest, `msys${input.bitness}`);
 
       if (INSTALL_CACHE_ENABLED) {
         instCache = new InstallCache(msysRootDir, input);
@@ -247,7 +271,7 @@ async function run() {
         let inst_dest = await downloadInstaller(input);
 
         changeGroup('Extracting MSYS2...');
-        await exec.exec(inst_dest, ['-y'], {cwd: tmp_dir});
+        await exec.exec(inst_dest, ['-y'], {cwd: dest});
 
         changeGroup('Disable Key Refresh...');
         await disableKeyRefresh(msysRootDir);
@@ -289,8 +313,22 @@ async function run() {
     }
 
     if (input.install.length) {
-      core.startGroup('Installing additional packages...');
-      await pacman(['-S', '--needed', '--overwrite', '*'].concat(input.install), {});
+      core.startGroup('Installing additional packages through pacman...');
+      await pacman(['-S', '--needed', '--overwrite', '*'].concat(
+        (input.pacboy.length) ? input.install.concat(['pactoys']) : input.install
+      ), {});
+      core.endGroup();
+    } else {
+      if (input.pacboy.length) {
+        core.startGroup('Installing pacboy...');
+        await pacman(['-S', '--needed', '--overwrite', '*', 'pactoys'], {});
+        core.endGroup();
+      }
+    }
+
+    if (input.pacboy.length) {
+      core.startGroup('Installing additional packages through pacboy...');
+      await pacman(['-S', '--needed'].concat(input.pacboy), {env: Object.assign({'MSYSTEM': input.msystem}, process.env)}, 'pacboy');
       core.endGroup();
     }
 
