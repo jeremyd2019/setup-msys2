@@ -328,7 +328,7 @@ async function run() {
 
     if (input.pacboy.length) {
       core.startGroup('Installing additional packages through pacboy...');
-      await pacman(['-S', '--needed'].concat(input.pacboy), {}, 'pacboy');
+      await pacman(['-S', '--needed'].concat(input.pacboy), {env: Object.assign({'MSYSTEM': input.msystem}, process.env)}, 'pacboy');
       core.endGroup();
     }
 
