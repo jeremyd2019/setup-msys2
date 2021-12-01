@@ -1,8 +1,18 @@
 # Changelog
 
-## [Unreleased](https://github.com/msys2/setup-msys2/compare/a5dfcea55d4fe86ab2bdc6289102ba2da5a74744...HEAD)
+## [Unreleased](https://github.com/msys2/setup-msys2/compare/3b0f3eb45312eb0a404c4d67de7696b833170b5f...HEAD)
 
 *None*
+
+## [2.7.0](https://github.com/msys2/setup-msys2/compare/a5dfcea55d4fe86ab2bdc6289102ba2da5a74744...3b0f3eb45312eb0a404c4d67de7696b833170b5f) - 2021/12/01
+
+### Changed
+
+- Update base distribution to [20211130](https://github.com/msys2/msys2-installer/releases/tag/2021-11-30). [[#179](https://github.com/msys2/setup-msys2/pull/179)]
+- Bump dependencies:
+  - @actions/cache to v1.0.8
+  - @vercel/ncc to v0.32.0
+  - eslint to v8.3.0
 
 ## [2.6.1](https://github.com/msys2/setup-msys2/compare/d7eeada078b00988a612156b15f6bb92c8f29e6c...a5dfcea55d4fe86ab2bdc6289102ba2da5a74744) - 2021/11/03
 
