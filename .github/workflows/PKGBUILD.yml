@@ -1,11 +1,24 @@
-name: Example PKGBUILD
+name: PKGBUILD
 
 on:
-  push:
-  pull_request:
-  schedule:
-    - cron: '0 0 * * 3'
-  workflow_dispatch:
+  workflow_call:
+    inputs:
+      name:
+        description: 'Name of the package/tool, to be appended to artifact names.'
+        required: true
+        type: string
+      matrix:
+        description: 'JSON list of systems to build and test the tool on.'
+        required: true
+        type: string
+      path:
+        description: 'Location of the PKGBUILD recipe, relative to the root of the repository.'
+        required: true
+        type: string
+      test:
+        description: 'Commands to test the tool after installing the package.'
+        required: true
+        type: string
 
 jobs:
 
@@ -15,11 +28,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - { icon: '⬛', sys: mingw32 }
-          - { icon: '🟦', sys: mingw64 }
-          - { icon: '🟨', sys: ucrt64  } # Experimental!
-          - { icon: '🟧', sys: clang64 } # Experimental!
+        include: ${{ fromJson(inputs.matrix) }}
     name: 🚧${{ matrix.icon }} ${{ matrix.sys }} | makepkg
     defaults:
       run:
@@ -47,20 +56,20 @@ jobs:
 
     - name: '🚧 Build package'
       run: |
-        cd examples/pkgbuild
+        cd ${{ inputs.path }}
         makepkg-mingw --noconfirm --noprogressbar -sCLf
 
     - name: '📤 Upload artifact: package'
       uses: actions/upload-artifact@v2
       with:
-        name: ${{ matrix.sys }}-TOOL
-        path: examples/pkgbuild/*.zst
+        name: ${{ matrix.sys }}-${{ inputs.name }}
+        path: ${{ inputs.path }}/*.zst
 
     - name: '🔍 Show package content'
       run: |
         mkdir tmp
         cd tmp
-        tar -xf ../examples/pkgbuild/*.zst
+        tar -xf ../${{ inputs.path }}/*.zst
         tree .
 
 
@@ -70,11 +79,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - { icon: '⬛', sys: mingw32 }
-          - { icon: '🟦', sys: mingw64 }
-          - { icon: '🟨', sys: ucrt64  } # Experimental!
-          - { icon: '🟧', sys: clang64 } # Experimental!
+        include: ${{ fromJson(inputs.matrix) }}
     name: 🚦${{ matrix.icon }} ${{ matrix.sys }} | test
     defaults:
       run:
@@ -91,10 +96,10 @@ jobs:
       uses: actions/download-artifact@v2
       with:
         path: .
-        name: ${{ matrix.sys }}-TOOL
+        name: ${{ matrix.sys }}-${{ inputs.name }}
 
     - name: '🛠️ Install package'
       run: pacman -U --noconfirm --noprogressbar *.zst
 
     - name: '🚦 Test package'
-      run: TOOL
+      run: ${{ inputs.test }}

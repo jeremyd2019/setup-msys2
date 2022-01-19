@@ -1,8 +1,33 @@
 # Changelog
 
-## [Unreleased](https://github.com/msys2/setup-msys2/compare/3b0f3eb45312eb0a404c4d67de7696b833170b5f...HEAD)
+## [Unreleased](https://github.com/msys2/setup-msys2/compare/ccd141b53295291b51f22fa27a10deedc0d86f44...HEAD)
 
 *None*
+
+## [2.8.1](https://github.com/msys2/setup-msys2/compare/15654cd818544c9006b12959f1a948fed7828850...ccd141b53295291b51f22fa27a10deedc0d86f44) - 2022/01/19
+
+### Changed
+
+- Update base distribution to [20220118](https://github.com/msys2/msys2-installer/releases/tag/2022-01-18). [[#192](https://github.com/msys2/setup-msys2/pull/192)]
+- Bump dependencies:
+  - eslint to v8.7.0
+
+## [2.8.0](https://github.com/msys2/setup-msys2/compare/3b0f3eb45312eb0a404c4d67de7696b833170b5f...15654cd818544c9006b12959f1a948fed7828850) - 2022/01/05
+
+### Added
+
+- [Composite Action](https://docs.github.com/en/actions/creating-actions/creating-a-composite-action) `matrix`.
+
+### Changed
+
+- Default branch renamed from `master` to `main`.
+- Update workflow `Test` to use Action `matrix`.
+- Examples:
+  - Update cmake example workflow to use option `pacboy`.
+  - Convert `PKGBUILD.yml` into a [Reusable Workflow](https://docs.github.com/en/actions/learn-github-actions/reusing-workflows). Add workflow `Tool.yml`, which uses it.
+- Bump dependencies:
+  - @vercel/ncc to v0.33.1
+  - eslint to v8.6.0
 
 ## [2.7.0](https://github.com/msys2/setup-msys2/compare/a5dfcea55d4fe86ab2bdc6289102ba2da5a74744...3b0f3eb45312eb0a404c4d67de7696b833170b5f) - 2021/12/01
 

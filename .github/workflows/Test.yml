@@ -12,7 +12,8 @@ jobs:
   eslint:
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@v2
+    - name: 🧰 Checkout
+      uses: actions/checkout@v2
     - run: |
         npm ci
         npm run lint
@@ -20,57 +21,63 @@ jobs:
   cache:
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@v2
-    - name: build action
+    - name: 🧰 Checkout
+      uses: actions/checkout@v2
+    - name: 🚧 build action
       shell: bash
       run: |
         npm ci
         npm run pkg
         rm -rf node_modules
-    - uses: actions/upload-artifact@v2
+    - name: 📤 Upload artifact
+      uses: actions/upload-artifact@v2
       with:
         name: action
         path: index.js
-    - name: run action
+    - name: 🚧 run action
       uses: ./
       with:
         update: true
         install: base-devel git
     - shell: msys2 {0}
+      name: 🚦 test
       run: |
         uname -a
+
 
   powershell:
     needs: [cache]
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/download-artifact@v2
+    - name: 🧰 Checkout
+      uses: actions/checkout@v2
+    - name: 📥 Download artifact
+      uses: actions/download-artifact@v2
       with:
         name: action
-    - name: run action
+    - name: 🚧 run action
       uses: ./
-    - name: test MSYS
+    - name: 🟪 test MSYS
       run: |
         $env:MSYSTEM = 'MSYS'
         msys2 ./test.sh MSYS
-    - name: test MINGW64
+    - name: 🟦 test MINGW64
       run: |
         $env:MSYSTEM = 'MINGW64'
         msys2 ./test.sh MINGW64
-    - name: test MINGW32
+    - name: ⬛ test MINGW32
       run: |
         $env:MSYSTEM = 'MINGW32'
         msys2 ./test.sh MINGW32
-    - name: test UCRT64
+    - name: 🟨 test UCRT64
       run: |
         $env:MSYSTEM = 'UCRT64'
         msys2 ./test.sh UCRT64
-    - name: test CLANG32
+    - name: 🟫 test CLANG32
       run: |
         $env:MSYSTEM = 'CLANG32'
         msys2 ./test.sh CLANG32
-    - name: test CLANG64
+    - name: 🟧 test CLANG64
       run: |
         $env:MSYSTEM = 'CLANG64'
         msys2 ./test.sh CLANG64
@@ -80,38 +87,40 @@ jobs:
     needs: [cache]
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/download-artifact@v2
+    - name: 🧰 Checkout
+      uses: actions/checkout@v2
+    - name: 📥 Download artifact
+      uses: actions/download-artifact@v2
       with:
         name: action
-    - name: run action
+    - name: 🚧 run action
       uses: ./
-    - name: test MSYS
+    - name: 🟪 test MSYS
       shell: cmd
       run: |
         set MSYSTEM=MSYS
         msys2 ./test.sh MSYS
-    - name: test MINGW64
+    - name: 🟦 test MINGW64
       shell: cmd
       run: |
         set MSYSTEM=MINGW64
         msys2 ./test.sh MINGW64
-    - name: test MINGW32
+    - name: ⬛ test MINGW32
       shell: cmd
       run: |
         set MSYSTEM=MINGW32
         msys2 ./test.sh MINGW32
-    - name: test UCRT64
+    - name: 🟨 test UCRT64
       shell: cmd
       run: |
         set MSYSTEM=UCRT64
         msys2 ./test.sh UCRT64
-    - name: test CLANG32
+    - name: 🟫 test CLANG32
       shell: cmd
       run: |
         set MSYSTEM=CLANG32
         msys2 ./test.sh CLANG32
-    - name: test CLANG64
+    - name: 🟧 test CLANG64
       shell: cmd
       run: |
         set MSYSTEM=CLANG64
@@ -122,33 +131,35 @@ jobs:
     needs: [cache]
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/download-artifact@v2
+    - name: 🧰 Checkout
+      uses: actions/checkout@v2
+    - name: 📥 Download artifact
+      uses: actions/download-artifact@v2
       with:
         name: action
-    - name: run action
+    - name: 🚧 run action
       uses: ./
-    - name: test MSYS
+    - name: 🟪 test MSYS
       run: msys2 ./test.sh MSYS
       env:
         MSYSTEM: MSYS
-    - name: test MINGW64
+    - name: 🟦 test MINGW64
       run: msys2 ./test.sh MINGW64
       env:
         MSYSTEM: MINGW64
-    - name: test MINGW32
+    - name: ⬛ test MINGW32
       run: msys2 ./test.sh MINGW32
       env:
         MSYSTEM: MINGW32
-    - name: test UCRT64
+    - name: 🟨 test UCRT64
       run: msys2 ./test.sh UCRT64
       env:
         MSYSTEM: UCRT64
-    - name: test CLANG32
+    - name: 🟫 test CLANG32
       run: msys2 ./test.sh CLANG32
       env:
         MSYSTEM: CLANG32
-    - name: test CLANG64
+    - name: 🟧 test CLANG64
       run: msys2 ./test.sh CLANG64
       env:
         MSYSTEM: CLANG64
@@ -158,58 +169,17 @@ jobs:
     needs: [cache]
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/download-artifact@v2
+    - name: 🧰 Checkout
+      uses: actions/checkout@v2
+    - name: 📥 Download artifact
+      uses: actions/download-artifact@v2
       with:
         name: action
-    - name: run action
+    - name: 🚧 run action
       uses: ./
     - shell: msys2 {0}
       run: |
         uname -a
-
-
-  msystem:
-    needs: [cache]
-    strategy:
-      fail-fast: false
-      matrix:
-        task: [ MSYS, MINGW64, MINGW32, UCRT64, CLANG32, CLANG64 ]
-        bitness: [ 64, 32 ]
-    runs-on: windows-latest
-    steps:
-    - uses: actions/checkout@v2
-    - uses: actions/download-artifact@v2
-      with:
-        name: action
-    - name: run action
-      uses: ./
-      with:
-        msystem: ${{ matrix.task }}
-        bitness: ${{ matrix.bitness }}
-    - run: msys2 ./test.sh ${{ matrix.task }}
-
-
-  update:
-    needs: [cache]
-    strategy:
-      fail-fast: false
-      matrix:
-        msystem: [ MSYS, MINGW64, MINGW32, UCRT64, CLANG32, CLANG64 ]
-        bitness: [ 64, 32 ]
-    runs-on: windows-latest
-    steps:
-    - uses: actions/checkout@v2
-    - uses: actions/download-artifact@v2
-      with:
-        name: action
-    - name: run action
-      uses: ./
-      with:
-        update: true
-        msystem: ${{ matrix.msystem }}
-        bitness: ${{ matrix.bitness }}
-    - run: msys2 ./test.sh ${{ matrix.msystem }}
 
 
   MSYS2_PATH_TYPE:
@@ -217,11 +187,13 @@ jobs:
     runs-on: windows-latest
     steps:
     - uses: actions/setup-go@v1
-    - uses: actions/checkout@v2
-    - uses: actions/download-artifact@v2
+    - name: 🧰 Checkout
+      uses: actions/checkout@v2
+    - name: 📥 Download artifact
+      uses: actions/download-artifact@v2
       with:
         name: action
-    - name: run action
+    - name: 🚧 run action
       uses: ./
     - run: msys2 -c "go env"
       env:
@@ -233,11 +205,13 @@ jobs:
     runs-on: windows-latest
     steps:
     - uses: actions/setup-go@v1
-    - uses: actions/checkout@v2
-    - uses: actions/download-artifact@v2
+    - name: 🧰 Checkout
+      uses: actions/checkout@v2
+    - name: 📥 Download artifact
+      uses: actions/download-artifact@v2
       with:
         name: action
-    - name: run action
+    - name: 🚧 run action
       uses: ./
       with:
         path-type: inherit
@@ -245,71 +219,29 @@ jobs:
 
 
   install:
+    name: 🟦 mingw64 | install ${{ matrix.install }} | ${{ matrix.bitness }}
     needs: [cache]
     strategy:
       fail-fast: false
       matrix:
         install: [ false, git, 'base-devel git' ]
+        bitness: [ 32, 64 ]
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/download-artifact@v2
+    - name: 🧰 Checkout
+      uses: actions/checkout@v2
+    - name: 📥 Download artifact
+      uses: actions/download-artifact@v2
       with:
         name: action
-    - name: run action
+    - name: 🚧 run action
       uses: ./
       with:
         update: true
         install: ${{ matrix.install }}
-        msystem: MINGW64
-    - run: msys2 ./test.sh MINGW64
-
-  install-and-pacboy:
-    needs: [cache]
-    runs-on: windows-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        msystem: [ MINGW64, MINGW32, UCRT64, CLANG64 ]
-    steps:
-    - uses: actions/checkout@v2
-    - uses: actions/download-artifact@v2
-      with:
-        name: action
-    - name: run action
-      uses: ./
-      with:
-        msystem: ${{ matrix.msystem }}
-        update: true
-        install: git
-        pacboy: openssl:p
-    - shell: msys2 {0}
-      run: |
-        uname -a
-        openssl help
-
-  pacboy:
-    needs: [cache]
-    runs-on: windows-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        msystem: [ MINGW64, MINGW32, UCRT64, CLANG64 ]
-    steps:
-    - uses: actions/checkout@v2
-    - uses: actions/download-artifact@v2
-      with:
-        name: action
-    - name: run action
-      uses: ./
-      with:
-        msystem: ${{ matrix.msystem }}
-        update: true
-        pacboy: openssl:p
-    - shell: msys2 {0}
-      run: |
-        uname -a
-        openssl help
+        bitness: ${{ matrix.bitness }}
+        msystem: mingw64
+    - run: msys2 ./test.sh mingw64
 
 
   defaultclean:
@@ -321,13 +253,15 @@ jobs:
     steps:
     - run: git config --global core.autocrlf input
       shell: bash
-    - uses: actions/checkout@v2
+    - name: 🧰 Checkout
+      uses: actions/checkout@v2
       with:
         fetch-depth: 0
-    - uses: actions/download-artifact@v2
+    - name: 📥 Download artifact
+      uses: actions/download-artifact@v2
       with:
         name: action
-    - name: run action
+    - name: 🚧 run action
       uses: ./
       with:
         update: true
@@ -342,13 +276,15 @@ jobs:
       run:
         shell: msys2 {0}
     steps:
-    - uses: actions/checkout@v2
+    - name: 🧰 Checkout
+      uses: actions/checkout@v2
       with:
         fetch-depth: 0
-    - uses: actions/download-artifact@v2
+    - name: 📥 Download artifact
+      uses: actions/download-artifact@v2
       with:
         name: action
-    - name: run action
+    - name: 🚧 run action
       uses: ./
       with:
         update: true
@@ -360,11 +296,13 @@ jobs:
     needs: [cache]
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/download-artifact@v2
+    - name: 🧰 Checkout
+      uses: actions/checkout@v2
+    - name: 📥 Download artifact
+      uses: actions/download-artifact@v2
       with:
         name: action
-    - name: run action
+    - name: 🚧 run action
       uses: ./
     - shell: msys2 {0}
       run: |
@@ -376,11 +314,13 @@ jobs:
     needs: [cache]
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/download-artifact@v2
+    - name: 🧰 Checkout
+      uses: actions/checkout@v2
+    - name: 📥 Download artifact
+      uses: actions/download-artifact@v2
       with:
         name: action
-    - name: run action
+    - name: 🚧 run action
       uses: ./
     - shell: msys2 {0}
       run: |
@@ -394,11 +334,13 @@ jobs:
     needs: [cache]
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/download-artifact@v2
+    - name: 🧰 Checkout
+      uses: actions/checkout@v2
+    - name: 📥 Download artifact
+      uses: actions/download-artifact@v2
       with:
         name: action
-    - name: run action
+    - name: 🚧 run action
       uses: ./
       with:
         release: false
@@ -410,24 +352,30 @@ jobs:
 
 
   platformchecks:
+    name: ${{ matrix.icon }} ${{ matrix.platform }} | platformchecks
     needs: [cache]
     strategy:
       fail-fast: false
       matrix:
-        platform: [ macos, ubuntu ]
+        include:
+          - { platform: macos, icon: '🐧' }
+          - { platform: ubuntu, icon: '🍎' }
     runs-on: ${{ matrix.platform }}-latest
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/download-artifact@v2
+    - name: 🧰 Checkout
+      uses: actions/checkout@v2
+    - name: 📥 Download artifact
+      uses: actions/download-artifact@v2
       with:
         name: action
-    - name: run action
+    - name: 🚧 run action
       uses: ./
       with:
         platform-check-severity: warn
 
 
   location:
+    name: location | ${{ matrix.location }}
     needs: [cache]
     runs-on: windows-latest
     strategy:
@@ -437,11 +385,13 @@ jobs:
         - D:\
         - D:\some\arbitrary
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/download-artifact@v2
+    - name: 🧰 Checkout
+      uses: actions/checkout@v2
+    - name: 📥 Download artifact
+      uses: actions/download-artifact@v2
       with:
         name: action
-    - name: run action
+    - name: 🚧 run action
       uses: ./
       with:
         location: ${{ matrix.location }}
@@ -449,3 +399,120 @@ jobs:
     - shell: msys2 {0}
       run: |
         cygpath -m /
+
+
+  matrix:
+    needs: cache
+    name: ⬜ Generate lists of jobs
+    runs-on: ubuntu-latest
+    outputs:
+      jobs: ${{ steps.all.outputs.jobs }}
+      min: ${{ steps.min.outputs.jobs }}
+    steps:
+    - name: 🧰 Checkout
+      uses: actions/checkout@v2
+    - id: all
+      uses: ./matrix
+    - id: min
+      uses: ./matrix
+      with:
+        systems: 'mingw32 mingw64 ucrt64 clang64'
+
+
+  msystem:
+    name: ${{ matrix.icon }} ${{ matrix.sys }} | msystem
+    needs: matrix
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJson(needs.matrix.outputs.jobs) }}
+    runs-on: windows-latest
+    steps:
+    - name: 🧰 Checkout
+      uses: actions/checkout@v2
+    - name: 📥 Download artifact
+      uses: actions/download-artifact@v2
+      with:
+        name: action
+    - name: 🚧 run action
+      uses: ./
+      with:
+        msystem: ${{ matrix.sys }}
+    - run: msys2 ./test.sh ${{ matrix.sys }}
+
+
+  update:
+    name: ${{ matrix.icon }} ${{ matrix.sys }} | update
+    needs: matrix
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJson(needs.matrix.outputs.jobs) }}
+    runs-on: windows-latest
+    steps:
+    - name: 🧰 Checkout
+      uses: actions/checkout@v2
+    - name: 📥 Download artifact
+      uses: actions/download-artifact@v2
+      with:
+        name: action
+    - name: 🚧 run action
+      uses: ./
+      with:
+        update: true
+        msystem: ${{ matrix.sys }}
+    - run: msys2 ./test.sh ${{ matrix.sys }}
+
+
+  install-and-pacboy:
+    name: ${{ matrix.icon }} ${{ matrix.sys }} | install-and-pacboy
+    needs: matrix
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJson(needs.matrix.outputs.min) }}
+    steps:
+    - name: 🧰 Checkout
+      uses: actions/checkout@v2
+    - name: 📥 Download artifact
+      uses: actions/download-artifact@v2
+      with:
+        name: action
+    - name: 🚧 run action
+      uses: ./
+      with:
+        msystem: ${{ matrix.sys }}
+        update: true
+        install: git
+        pacboy: openssl:p
+    - shell: msys2 {0}
+      run: |
+        uname -a
+        openssl help
+
+  pacboy:
+    name: ${{ matrix.icon }} ${{ matrix.sys }} | pacboy
+    needs: matrix
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJson(needs.matrix.outputs.min) }}
+    steps:
+    - name: 🧰 Checkout
+      uses: actions/checkout@v2
+    - name: 📥 Download artifact
+      uses: actions/download-artifact@v2
+      with:
+        name: action
+    - name: 🚧 run action
+      uses: ./
+      with:
+        msystem: ${{ matrix.sys }}
+        update: true
+        pacboy: openssl:p
+    - shell: msys2 {0}
+      run: |
+        uname -a
+        openssl help
