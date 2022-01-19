@@ -1,0 +1,37 @@
+name: Tool
+
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: '0 0 * * 3'
+  workflow_dispatch:
+
+jobs:
+
+  matrix:
+    name: ⬜ Generate list of jobs
+    runs-on: ubuntu-latest
+    outputs:
+      jobs: ${{ steps.matrix.outputs.jobs }}
+    steps:
+    - id: matrix
+      uses: msys2/setup-msys2/matrix@main
+      with:
+        systems: >-
+          mingw32
+          mingw64
+          ucrt64
+          clang64
+
+  msys2:
+    needs: matrix
+    uses: msys2/setup-msys2/.github/workflows/PKGBUILD.yml@main
+    with:
+      name: TOOL
+      matrix: ${{ needs.matrix.outputs.jobs }}
+      path: examples/pkgbuild
+      test: |
+        uname -a
+        which TOOL
+        TOOL
