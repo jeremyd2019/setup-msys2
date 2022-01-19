@@ -27,7 +27,7 @@ runs:
           'clang64': '🟧', # Experimental!
         }
         jobs = [
-            {'sys': sys.lower(), 'icon': icons[sys.lower()]}
-            for sys in '${{ inputs.systems }}'.split(' ')
+            {'sys': sys.lower(), 'icon': icons[sys.lower()], 'bitness': bitness}
+            for sys in '${{ inputs.systems }}'.split(' ') for bitness in (32,64)
         ]
         print(f"::set-output name=jobs::{jobs!s}")

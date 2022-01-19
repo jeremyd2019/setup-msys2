@@ -420,7 +420,7 @@ jobs:
 
 
   msystem:
-    name: ${{ matrix.icon }} ${{ matrix.sys }} | msystem
+    name: ${{ matrix.icon }} ${{ matrix.sys }} | msystem | ${{ matrix.bitness }}
     needs: matrix
     strategy:
       fail-fast: false
@@ -438,11 +438,12 @@ jobs:
       uses: ./
       with:
         msystem: ${{ matrix.sys }}
+        bitness: ${{ matrix.bitness }}
     - run: msys2 ./test.sh ${{ matrix.sys }}
 
 
   update:
-    name: ${{ matrix.icon }} ${{ matrix.sys }} | update
+    name: ${{ matrix.icon }} ${{ matrix.sys }} | update | ${{ matrix.bitness }}
     needs: matrix
     strategy:
       fail-fast: false
@@ -461,11 +462,12 @@ jobs:
       with:
         update: true
         msystem: ${{ matrix.sys }}
+        bitness: ${{ matrix.bitness }}
     - run: msys2 ./test.sh ${{ matrix.sys }}
 
 
   install-and-pacboy:
-    name: ${{ matrix.icon }} ${{ matrix.sys }} | install-and-pacboy
+    name: ${{ matrix.icon }} ${{ matrix.sys }} | install-and-pacboy | ${{ matrix.bitness }}
     needs: matrix
     runs-on: windows-latest
     strategy:
@@ -483,6 +485,7 @@ jobs:
       uses: ./
       with:
         msystem: ${{ matrix.sys }}
+        bitness: ${{ matrix.bitness }}
         update: true
         install: git
         pacboy: openssl:p
@@ -492,7 +495,7 @@ jobs:
         openssl help
 
   pacboy:
-    name: ${{ matrix.icon }} ${{ matrix.sys }} | pacboy
+    name: ${{ matrix.icon }} ${{ matrix.sys }} | pacboy | ${{ matrix.bitness }}
     needs: matrix
     runs-on: windows-latest
     strategy:
@@ -510,6 +513,7 @@ jobs:
       uses: ./
       with:
         msystem: ${{ matrix.sys }}
+        bitness: ${{ matrix.bitness }}
         update: true
         pacboy: openssl:p
     - shell: msys2 {0}
