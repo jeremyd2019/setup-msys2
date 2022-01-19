@@ -15,9 +15,9 @@ const checksum = '5e188c7f3d564a2291d20b717712bb6f789a17b415e540f528c0025130ada4
 // see https://github.com/msys2/setup-msys2/issues/61
 const INSTALL_CACHE_ENABLED = false;
 const CACHE_FLUSH_COUNTER = 0;
-const inst32_version = '2021-11-30';
+const inst32_version = '2022-01-18';
 const inst32_url = `https://github.com/jeremyd2019/msys2-installer/releases/download/${inst32_version}-build32/msys2-base-i686-${inst32_version.replace(/-/g, '')}.sfx.exe`;
-const checksum32 = '332e97dbc7435e1170b30763ed2dae24c660cc2d0ccb7586026899f3e27e3cf4';
+const checksum32 = '17bbefdef0b5c2d7cd384c5eecb05e7056c1bfc7a02ae5f1129bef1c76b430bc';
 
 function changeGroup(str) {
   core.endGroup();
