@@ -9,9 +9,9 @@ const crypto = require('crypto');
 const assert = require('assert').strict;
 const { hashElement } = require('folder-hash');
 
-const inst_version = '2022-01-18';
+const inst_version = '2022-03-19';
 const inst_url = `https://github.com/msys2/msys2-installer/releases/download/${inst_version}/msys2-base-x86_64-${inst_version.replace(/-/g, '')}.sfx.exe`;
-const checksum = '5e188c7f3d564a2291d20b717712bb6f789a17b415e540f528c0025130ada4e1';
+const checksum = '0548cc4c1f667ba8ab22760e039d2c8a088b419b432c9597eb8adf8235c13fab';
 // see https://github.com/msys2/setup-msys2/issues/61
 const INSTALL_CACHE_ENABLED = false;
 const CACHE_FLUSH_COUNTER = 0;
@@ -84,7 +84,7 @@ async function downloadInstaller(input) {
   const inst_path = tc.find('msys2-installer', version, arch);
   const destination = inst_path ? path.join(inst_path, 'base.exe') : await tc.downloadTool(url);
   let computedChecksum = '';
-  await exec.exec(`powershell.exe`, [`(Get-FileHash ${destination} -Algorithm SHA256)[0].Hash`], {listeners: {stdout: (data) => { computedChecksum += data.toString(); }}});
+  await exec.exec(`powershell.exe`, [`(Get-FileHash '${destination}' -Algorithm SHA256)[0].Hash`], {listeners: {stdout: (data) => { computedChecksum += data.toString(); }}});
   if (computedChecksum.slice(0, -2).toUpperCase() !== chksum.toUpperCase()) {
     throw new Error(`The SHA256 of the installer does not match! expected ${chksum} got ${computedChecksum}`);
   }
