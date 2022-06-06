@@ -1,8 +1,51 @@
 # Changelog
 
-## [Unreleased](https://github.com/msys2/setup-msys2/compare/ded8116e9f153e66965b1ed147c3c15c0b60fce3...HEAD)
+## [Unreleased](https://github.com/msys2/setup-msys2/compare/2e083bbad7fe8c91e321ac59a20c1b7ea88c449d...HEAD)
 
 *None*
+
+## [2.12.0](https://github.com/msys2/setup-msys2/compare/08026e284f453584d7bfb47c2af42855734d6d1e...2e083bbad7fe8c91e321ac59a20c1b7ea88c449d) - 2022/06/06
+
+### Changed
+
+- Update base distribution to [20220603](https://github.com/msys2/msys2-installer/releases/tag/2022-06-03). [[#233](https://github.com/msys2/setup-msys2/pull/233)]
+- Bump dependencies:
+  - @actions/cache to v2.0.5
+  - @actions/core to v1.8.2
+  - @actions/tool-cache to v2.0.1
+  - eslint to v8.17.0
+  - @vercel/ncc to v0.34.0
+
+## [2.11.0](https://github.com/msys2/setup-msys2/compare/019417bff62dcc533ad9f4caee190aa3487fe97a...08026e284f453584d7bfb47c2af42855734d6d1e) - 2022/05/03
+
+### Changed
+
+- Update base distribution to [20220503](https://github.com/msys2/msys2-installer/releases/tag/2022-05-03). [[#219](https://github.com/msys2/setup-msys2/pull/219)]
+
+## [2.10.3](https://github.com/msys2/setup-msys2/compare/5bb19b04198a16a0282d7abcc1fdb877a1514790...019417bff62dcc533ad9f4caee190aa3487fe97a) - 2022/05/03
+
+### Changed
+
+- CLANG32 is enabled by default in latest pacman.
+- Bump dependencies:
+  - @actions/core to v1.7.0
+
+## [2.10.2](https://github.com/msys2/setup-msys2/compare/f501cd73399eab7b5442a4ce4ced5cb538cd7751...5bb19b04198a16a0282d7abcc1fdb877a1514790) - 2022/05/01
+
+### Changed
+
+- Use mingw mirrorlist for CLANG32.
+- Require 'update: true' to install packages on CLANG32.
+
+## [2.10.1](https://github.com/msys2/setup-msys2/compare/ded8116e9f153e66965b1ed147c3c15c0b60fce3...f501cd73399eab7b5442a4ce4ced5cb538cd7751) - 2022/05/01
+
+### Changed
+
+- Enable CLANG32 when `release` is `true`.
+- Bump dependencies:
+  - @actions/cache to v2.0.2
+  - @vercel/ncc to v0.33.4
+  - eslint to v8.14.0
 
 ## [2.10.0](https://github.com/msys2/setup-msys2/compare/01ac7b3f1f49a74acd8a1cfe362df8311c8c8c56...ded8116e9f153e66965b1ed147c3c15c0b60fce3) - 2022/03/21
 
