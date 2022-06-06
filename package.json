@@ -27,14 +27,14 @@
   },
   "homepage": "https://github.com/msys2/setup-msys2",
   "dependencies": {
-    "@actions/cache": "^1.0.10",
-    "@actions/core": "^1.6.0",
+    "@actions/cache": "^2.0.5",
+    "@actions/core": "^1.8.2",
     "@actions/exec": "^1.1.1",
-    "@actions/tool-cache": "^1.7.2",
+    "@actions/tool-cache": "^2.0.1",
     "folder-hash": "^4.0.2"
   },
   "devDependencies": {
-    "@vercel/ncc": "^0.33.1",
-    "eslint": "^8.11.0"
+    "@vercel/ncc": "^0.34.0",
+    "eslint": "^8.16.0"
   }
 }
