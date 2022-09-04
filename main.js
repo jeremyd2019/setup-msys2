@@ -9,9 +9,9 @@ const crypto = require('crypto');
 const assert = require('assert').strict;
 const { hashElement } = require('folder-hash');
 
-const inst_version = '2022-06-03';
+const inst_version = '2022-09-04';
 const inst_url = `https://github.com/msys2/msys2-installer/releases/download/${inst_version}/msys2-base-x86_64-${inst_version.replace(/-/g, '')}.sfx.exe`;
-const checksum = '0694bf6661aa9dae8338be87b633ae9ac20c68d593cc17658a1dffe6291098bf';
+const checksum = 'bb92718bce932398a2e236d60c53ef35c3bc9a96999a26dd5814e66a2f4baf1f';
 // see https://github.com/msys2/setup-msys2/issues/61
 const INSTALL_CACHE_ENABLED = false;
 const CACHE_FLUSH_COUNTER = 0;
@@ -295,10 +295,12 @@ async function run() {
       core.endGroup();
     }
 
+    core.startGroup('Disable CheckSpace...');
+    // Reduce time required to install packages by disabling pacman's disk space checking
+    await runMsys(['sed', '-i', 's/^CheckSpace/#CheckSpace/g', '/etc/pacman.conf']);
+    core.endGroup();
+
     if (input.update) {
-      core.startGroup('Disable CheckSpace...');
-      // Reduce time required to install packages by disabling pacman's disk space checking
-      await runMsys(['sed', '-i', 's/^CheckSpace/#CheckSpace/g', '/etc/pacman.conf']);
       changeGroup('Updating packages...');
       await pacman(['-Syuu', '--overwrite', '*'], {ignoreReturnCode: true});
       // We have changed /etc/pacman.conf above which means on a pacman upgrade

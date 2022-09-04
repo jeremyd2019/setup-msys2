@@ -1,8 +1,17 @@
 # Changelog
 
-## [Unreleased](https://github.com/msys2/setup-msys2/compare/2e083bbad7fe8c91e321ac59a20c1b7ea88c449d...HEAD)
+## [Unreleased](https://github.com/msys2/setup-msys2/compare/9426ebb2048a2428ebfda0c5686251bfb6ae41dd...HEAD)
 
-*None*
+
+## [2.13.0](https://github.com/msys2/setup-msys2/compare/2e083bbad7fe8c91e321ac59a20c1b7ea88c449d...9426ebb2048a2428ebfda0c5686251bfb6ae41dd) - 2022/09/04
+
+- Update base distribution to [20220904](https://github.com/msys2/msys2-installer/releases/tag/2022-09-04). [[#250](https://github.com/msys2/setup-msys2/pull/250)]
+- Disable pacman's disk space checking also when not updating [[#242](https://github.com/msys2/setup-msys2/pull/242)]
+- Add github-actions to dependabot.yml [[#240](https://github.com/msys2/setup-msys2/pull/240)]
+- Bump dependencies:
+  - @actions/cache to v3.0.4
+  - @actions/core to v1.9.1
+  - eslint to v8.23.0
 
 ## [2.12.0](https://github.com/msys2/setup-msys2/compare/08026e284f453584d7bfb47c2af42855734d6d1e...2e083bbad7fe8c91e321ac59a20c1b7ea88c449d) - 2022/06/06
 
