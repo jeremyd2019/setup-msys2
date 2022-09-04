@@ -304,6 +304,10 @@ async function run() {
       // We have changed /etc/pacman.conf above which means on a pacman upgrade
       // pacman.conf will be installed as pacman.conf.pacnew
       await runMsys(['mv', '-f', '/etc/pacman.conf.pacnew', '/etc/pacman.conf'], {ignoreReturnCode: true, silent: true});
+      await runMsys(['sed', '-i', 's/^CheckSpace/#CheckSpace/g', '/etc/pacman.conf']);
+      if (input.bitness === "32") {
+        await runMsys(['bash', '-c', 'grep -qFx "[build32]" /etc/pacman.conf || sed -i "/\\[msys\\]/i [build32]\\nServer = https://github.com/jeremyd2019/msys2-build32/releases/download/repo\\nSigLevel = Optional\\n" /etc/pacman.conf']);
+      }
       changeGroup('Killing remaining tasks...');
       await killMsysProcs(input);
       changeGroup('Final system upgrade...');
