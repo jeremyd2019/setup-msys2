@@ -1,10 +1,17 @@
 # Changelog
 
-## [Unreleased](https://github.com/msys2/setup-msys2/compare/9426ebb2048a2428ebfda0c5686251bfb6ae41dd...HEAD)
+## [Unreleased](https://github.com/msys2/setup-msys2/compare/b2b99bf1b1555a6d130258fe0e4c80f275f665e2...HEAD)
 
 ### Changed
 
+
+## [2.14.0](https://github.com/msys2/setup-msys2/compare/9426ebb2048a2428ebfda0c5686251bfb6ae41dd...b2b99bf1b1555a6d130258fe0e4c80f275f665e2) - 2022/11/01
+
+### Changed
+
+- Update base distribution to [20221028](https://github.com/msys2/msys2-installer/releases/tag/2022-10-28). [[#250](https://github.com/msys2/setup-msys2/pull/259)]
 - Bump dependencies:
+  - @actions/cache to v3.0.6
   - @actions/core to v1.10.0
   - eslint to v8.26.0
 
