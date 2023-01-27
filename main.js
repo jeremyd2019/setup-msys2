@@ -1,17 +1,24 @@
-const cache = require('@actions/cache');
-const core = require('@actions/core');
-const io = require('@actions/io');
-const exec = require('@actions/exec');
-const tc = require('@actions/tool-cache');
-const path = require('path');
-const fs = require('fs');
-const crypto = require('crypto');
-const assert = require('assert').strict;
-const { hashElement } = require('folder-hash');
+import cache from '@actions/cache';
+import core from '@actions/core';
+import io from '@actions/io';
+import exec from '@actions/exec';
+import tc from '@actions/tool-cache';
+import path from 'node:path';
+import fs from 'node:fs';
+import crypto from 'node:crypto';
+import assert from 'node:assert/strict';
+import process from 'node:process';
+import { hashElement } from 'folder-hash';
 
-const inst_version = '2022-10-28';
+// XXX: hack to make ncc copy those files to dist
+// eslint-disable-next-line
+function dummy() {
+    return [__dirname + '/action.yml', __dirname + '/README.md'];
+}
+
+const inst_version = '2023-01-27';
 const inst_url = `https://github.com/msys2/msys2-installer/releases/download/${inst_version}/msys2-base-x86_64-${inst_version.replace(/-/g, '')}.sfx.exe`;
-const checksum = 'e365b79b4b30b6f4baf34bd93f3d2a41c0a92801c7a96d79cddbfca1090a0554';
+const checksum = '9bc4ee85635f2b3e7b73226c09772b89043da23c7beb4c420f93077b173b293a';
 // see https://github.com/msys2/setup-msys2/issues/61
 const INSTALL_CACHE_ENABLED = false;
 const CACHE_FLUSH_COUNTER = 0;
@@ -35,7 +42,7 @@ function parseInput() {
   let p_platformcheckseverity = core.getInput('platform-check-severity');
   let p_location = core.getInput('location');
 
-  const msystem_allowed = ['MSYS', 'MINGW32', 'MINGW64', 'UCRT64', 'CLANG32', 'CLANG64'];
+  const msystem_allowed = ['MSYS', 'MINGW32', 'MINGW64', 'UCRT64', 'CLANG32', 'CLANG64', 'CLANGARM64'];
   if (!msystem_allowed.includes(p_msystem.toUpperCase())) {
     throw new Error(`'msystem' needs to be one of ${ msystem_allowed.join(', ') }, got ${p_msystem}`);
   }
