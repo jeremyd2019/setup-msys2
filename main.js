@@ -16,24 +16,48 @@ function dummy() {
     return [__dirname + '/action.yml', __dirname + '/README.md'];
 }
 
-const inst_version = '2023-05-26';
-const inst_url = `https://github.com/msys2/msys2-installer/releases/download/${inst_version}/msys2-base-x86_64-${inst_version.replace(/-/g, '')}.sfx.exe`;
-const checksum = '80e6450388314d0aa77434f1dcacef7d14d73d9e2875cb79550eb864558c683e';
+const INSTALLER_VERSION = '2023-05-26';
+const INSTALLER_URL = `https://github.com/msys2/msys2-installer/releases/download/${INSTALLER_VERSION}/msys2-base-x86_64-${INSTALLER_VERSION.replace(/-/g, '')}.sfx.exe`;
+const INSTALLER_CHECKSUM = '80e6450388314d0aa77434f1dcacef7d14d73d9e2875cb79550eb864558c683e';
 // see https://github.com/msys2/setup-msys2/issues/61
 const INSTALL_CACHE_ENABLED = false;
 const CACHE_FLUSH_COUNTER = 0;
-const inst32_version = '2023-05-26';
-const inst32_url = `https://github.com/jeremyd2019/msys2-installer/releases/download/${inst32_version}-build32/msys2-base-i686-${inst32_version.replace(/-/g, '')}.sfx.exe`;
-const checksum32 = '5954296f5b894e4dd6675da87a0ad295d51c4514ebb71a193c663dc7a744d60d';
+const INSTALLER32_VERSION = '2023-05-26';
+const INSTALLER32_URL = `https://github.com/jeremyd2019/msys2-installer/releases/download/${INSTALLER32_VERSION}-build32/msys2-base-i686-${INSTALLER32_VERSION.replace(/-/g, '')}.sfx.exe`;
+const INSTALLER32_CHECKSUM = '5954296f5b894e4dd6675da87a0ad295d51c4514ebb71a193c663dc7a744d60d';
 
-function changeGroup(str) {
-  core.endGroup();
-  core.startGroup(str);
+class Input {
+
+    constructor() {
+        /** @type {boolean} */
+        this.release;
+        /** @type {boolean} */
+        this.update;
+        /** @type {string} */
+        this.pathtype;
+        /** @type {string} */
+        this.msystem;
+        /** @type {string} */
+        this.bitness;
+        /** @type {string[]} */
+        this.install;
+        /** @type {string[]} */
+        this.pacboy;
+        /** @type {string} */
+        this.platformcheckseverity;
+        /** @type {string} */
+        this.location;
+        /** @type {boolean} */
+        this.cache;
+    }
 }
 
+/**
+ * @returns {Input}
+ */
 function parseInput() {
-  let p_release = core.getInput('release') === 'true';
-  let p_update = core.getInput('update') === 'true';
+  let p_release = core.getBooleanInput('release');
+  let p_update = core.getBooleanInput('update');
   let p_pathtype = core.getInput('path-type');
   let p_msystem = core.getInput('msystem');
   let p_install = core.getInput('install');
@@ -41,6 +65,7 @@ function parseInput() {
   let p_pacboy = core.getInput('pacboy');
   let p_platformcheckseverity = core.getInput('platform-check-severity');
   let p_location = core.getInput('location');
+  let p_cache = core.getBooleanInput('cache');
 
   const msystem_allowed = ['MSYS', 'MINGW32', 'MINGW64', 'UCRT64', 'CLANG32', 'CLANG64', 'CLANGARM64'];
   if (!msystem_allowed.includes(p_msystem.toUpperCase())) {
@@ -62,47 +87,84 @@ function parseInput() {
       https://github.com/msys2/setup-msys2#release`);
   }
 
-  return {
-    release: p_release,
-    update: p_update,
-    pathtype: p_pathtype,
-    msystem: p_msystem,
-    install: p_install,
-    bitness: p_bitness,
-    pacboy: p_pacboy,
-    platformcheckseverity: p_platformcheckseverity,
-    location: (p_location == "RUNNER_TEMP") ? process.env['RUNNER_TEMP'] : p_location,
-  }
+  let input = new Input();
+  input.release = p_release;
+  input.update = p_update;
+  input.pathtype = p_pathtype;
+  input.msystem = p_msystem;
+  input.bitness = p_bitness;
+  input.install = p_install;
+  input.pacboy = p_pacboy;
+  input.platformcheckseverity = p_platformcheckseverity;
+  input.location = (p_location == "RUNNER_TEMP") ? process.env['RUNNER_TEMP'] : p_location;
+  input.cache = p_cache;
+
+  return input;
 }
 
+/**
+ * @param {string} filePath
+ * @returns {Promise<string>}
+ */
+async function computeChecksum(filePath) {
+  return new Promise((resolve, reject) => {
+    const hash = crypto.createHash('sha256');
+    const stream = fs.createReadStream(filePath);
+    stream.on('data', data => {
+      hash.update(data);
+    });
+    stream.on('end', () => {
+      const fileHash = hash.digest('hex');
+      resolve(fileHash);
+    });
+    stream.on('error', error => {
+      reject(error);
+    });
+  });
+}
+
+/**
+ * @returns {Promise<string>}
+ */
 async function downloadInstaller(input) {
-  let url = inst_url;
-  let version = inst_version
-  let chksum = checksum;
+  let url = INSTALLER_URL;
+  let version = INSTALLER_VERSION;
+  let chksum = INSTALLER_CHECKSUM;
   let arch = 'x64';
   if (input.bitness === "32") {
-    url = inst32_url;
-    version = inst32_version;
-    chksum = checksum32;
+    url = INSTALLER32_URL;
+    version = INSTALLER32_VERSION;
+    chksum = INSTALLER32_CHECKSUM;
     arch = 'x86';
   }
   // We use the last field only, so that each version is ensured semver incompatible with the previous one.
   version = `0.0.${version.replace(/-/g, '')}`;
   const inst_path = tc.find('msys2-installer', version, arch);
   const destination = inst_path ? path.join(inst_path, 'base.exe') : await tc.downloadTool(url);
-  let computedChecksum = '';
-  await exec.exec(`powershell.exe`, [`(Get-FileHash '${destination}' -Algorithm SHA256)[0].Hash`], {listeners: {stdout: (data) => { computedChecksum += data.toString(); }}});
-  if (computedChecksum.slice(0, -2).toUpperCase() !== chksum.toUpperCase()) {
+  let computedChecksum = await computeChecksum(destination);
+  if (computedChecksum.toUpperCase() !== chksum.toUpperCase()) {
     throw new Error(`The SHA256 of the installer does not match! expected ${chksum} got ${computedChecksum}`);
   }
   return path.join(inst_path || await tc.cacheFile(destination, 'base.exe', 'msys2-installer', version, arch), 'base.exe');
 }
 
+/**
+ * @param {string} msysRootDir
+ * @returns {Promise<void>}
+ */
 async function disableKeyRefresh(msysRootDir) {
   const postFile = path.join(msysRootDir, 'etc\\post-install\\07-pacman-key.post');
-  await exec.exec(`powershell.exe`, [`((Get-Content -path ${postFile} -Raw) -replace '--refresh-keys', '--version') | Set-Content -Path ${postFile}`]);
+  const content = await fs.promises.readFile(postFile, 'utf8');
+  const newContent = content.replace('--refresh-keys', '--version');
+  await fs.promises.writeFile(postFile, newContent, 'utf8');
 }
 
+/**
+ * @param {string[]} paths
+ * @param {string} restoreKey
+ * @param {string} saveKey
+ * @returns {Promise<string|undefined>}
+ */
 async function saveCacheMaybe(paths, restoreKey, saveKey) {
     if (restoreKey === saveKey) {
         console.log(`Cache unchanged, skipping save for ${saveKey}`);
@@ -126,18 +188,40 @@ async function saveCacheMaybe(paths, restoreKey, saveKey) {
     return cacheId;
 }
 
+/**
+ * @param {string[]} paths
+ * @param {string} primaryKey
+ * @param {string[]} restoreKeys
+ * @returns {Promise<string|undefined>}
+ */
 async function restoreCache(paths, primaryKey, restoreKeys) {
-    const restoreKey = await cache.restoreCache(paths, primaryKey, restoreKeys);
-    console.log(`Cache restore for ${primaryKey}, got ${restoreKey}`);
+    let restoreKey;
+    try {
+        restoreKey = await cache.restoreCache(paths, primaryKey, restoreKeys);
+        console.log(`Cache restore for ${primaryKey}, got ${restoreKey}`);
+    } catch (error) {
+        core.warning(`Restore cache failed: ${error.message}`);
+    } finally {
+        console.log(`Cache restore for ${primaryKey}, got ${restoreKey}`);
+    }
+
     return restoreKey;
 }
 
+/**
+ * @param {string} path
+ * @returns {Promise<string>}
+ */
 async function hashPath(path) {
   return (await hashElement(path, {encoding: 'hex'}))['hash'].toString();
 }
 
 class PackageCache {
 
+  /**
+   * @param {string} msysRootDir
+   * @param {Input} input
+   */
   constructor(msysRootDir, input) {
     // We include "update" in the fallback key so that a job run with update=false never fetches
     // a cache created with update=true. Because this would mean a newer version than needed is in the cache
@@ -147,7 +231,7 @@ class PackageCache {
     // We want a cache key that is ideally always the same for the same kind of job.
     // So that mingw32 and ming64 jobs, and jobs with different install packages have different caches.
     let shasum = crypto.createHash('sha1');
-    shasum.update([CACHE_FLUSH_COUNTER, input.release, input.update, input.pathtype, input.msystem, input.install, input.bitness].toString() + (input.bitness === "32" ? checksum32 : checksum));
+    shasum.update([CACHE_FLUSH_COUNTER, input.release, input.update, input.pathtype, input.msystem, input.install, input.bitness].toString() + (input.bitness === "32" ? INSTALLER32_CHECKSUM : INSTALLER_CHECKSUM));
     this.jobCacheKey = this.fallbackCacheKey + '-conf:' + shasum.digest('hex').slice(0, 8);
 
     this.restoreKey = undefined;
@@ -181,9 +265,13 @@ class PackageCache {
 
 class InstallCache {
 
+  /**
+   * @param {string} msysRootDir
+   * @param {Input} input
+   */
   constructor(msysRootDir, input) {
     let shasum = crypto.createHash('sha1');
-    shasum.update(JSON.stringify(input) + (input.bitness === "32" ? checksum32 : checksum));
+    shasum.update(JSON.stringify(input) + (input.bitness === "32" ? INSTALLER32_CHECKSUM : INSTALLER_CHECKSUM));
     this.jobCacheKey = 'msys2-inst-conf:' + shasum.digest('hex');
     this.msysRootDir = msysRootDir
   }
@@ -205,10 +293,18 @@ class InstallCache {
 
 let cmd = null;
 
-async function writeWrapper(msysRootDir, pathtype, destDir, name) {
+/**
+ * @param {string} msysRootDir
+ * @param {string} msystem
+ * @param {string} pathtype
+ * @param {string} destDir
+ * @param {string} name
+ */
+async function writeWrapper(msysRootDir, msystem, pathtype, destDir, name) {
   let wrap = [
     `@echo off`,
     `setlocal`,
+    `IF NOT DEFINED MSYSTEM set MSYSTEM=` + msystem,
     `IF NOT DEFINED MSYS2_PATH_TYPE set MSYS2_PATH_TYPE=` + pathtype,
     `set CHERE_INVOKING=1`,
     msysRootDir + `\\usr\\bin\\bash.exe -leo pipefail %*`
@@ -218,12 +314,21 @@ async function writeWrapper(msysRootDir, pathtype, destDir, name) {
   fs.writeFileSync(cmd, wrap);
 }
 
+/**
+ * @param {string[]} args
+ * @param {object} opts
+ */
 async function runMsys(args, opts) {
   assert.ok(cmd);
   const quotedArgs = args.map((arg) => {return `'${arg.replace(/'/g, `'\\''`)}'`}); // fix confused vim syntax highlighting with: `
   await exec.exec('cmd', ['/D', '/S', '/C', cmd].concat(['-c', quotedArgs.join(' ')]), opts);
 }
 
+/**
+ * @param {string[]} args
+ * @param {object} opts
+ * @param {string} [cmd]
+ */
 async function pacman(args, opts, cmd) {
   await runMsys([cmd ? cmd : 'pacman', '--noconfirm'].concat(args), opts);
 }
@@ -238,6 +343,9 @@ async function killMsysProcs(input) {
 }
 
 
+/**
+ * @returns {void}
+ */
 async function run() {
   try {
     const input = parseInput();
@@ -275,11 +383,13 @@ async function run() {
       if (!cachedInstall) {
         core.startGroup('Downloading MSYS2...');
         let inst_dest = await downloadInstaller(input);
+        core.endGroup();
 
-        changeGroup('Extracting MSYS2...');
+        core.startGroup('Extracting MSYS2...');
         await exec.exec(inst_dest, ['-y'], {cwd: dest});
+        core.endGroup();
 
-        changeGroup('Disable Key Refresh...');
+        core.startGroup('Disable Key Refresh...');
         await disableKeyRefresh(msysRootDir);
         core.endGroup();
       }
@@ -287,15 +397,17 @@ async function run() {
 
     const pathDir = path.join(tmp_dir, 'setup-msys2');
     await io.mkdirP(pathDir);
-    writeWrapper(msysRootDir, input.pathtype, pathDir, 'msys2.cmd');
+    writeWrapper(msysRootDir, input.msystem, input.pathtype, pathDir, 'msys2.cmd');
     core.addPath(pathDir);
 
-    const packageCache = new PackageCache(msysRootDir, input);
+    const packageCache = input.cache ? new PackageCache(msysRootDir, input) : null;
 
     if (!cachedInstall) {
-      core.startGroup('Restoring package cache...');
-      await packageCache.restore();
-      core.endGroup();
+      if (packageCache !== null) {
+        core.startGroup('Restoring package cache...');
+        await packageCache.restore();
+        core.endGroup();
+      }
 
       core.startGroup('Starting MSYS2 for the first time...');
       await runMsys(['uname', '-a']);
@@ -308,7 +420,7 @@ async function run() {
     core.endGroup();
 
     if (input.update) {
-      changeGroup('Updating packages...');
+      core.startGroup('Updating packages...');
       await pacman(['-Syuu', '--overwrite', '*'], {ignoreReturnCode: true});
       // We have changed /etc/pacman.conf above which means on a pacman upgrade
       // pacman.conf will be installed as pacman.conf.pacnew
@@ -317,9 +429,13 @@ async function run() {
       if (input.bitness === "32") {
         await runMsys(['bash', '-c', 'grep -qFx "[build32]" /etc/pacman.conf || sed -i "/\\[msys\\]/i [build32]\\nServer = https://github.com/jeremyd2019/msys2-build32/releases/download/repo\\nSigLevel = Optional\\n" /etc/pacman.conf']);
       }
-      changeGroup('Killing remaining tasks...');
+      core.endGroup();
+
+      core.startGroup('Killing remaining tasks...');
       await killMsysProcs(input);
-      changeGroup('Final system upgrade...');
+      core.endGroup();
+
+      core.startGroup('Final system upgrade...');
       await pacman(['-Syuu', '--overwrite', '*'], {});
       core.endGroup();
     }
@@ -340,21 +456,24 @@ async function run() {
 
     if (input.pacboy.length) {
       core.startGroup('Installing additional packages through pacboy...');
-      await pacman(['-S', '--needed'].concat(input.pacboy), {env: Object.assign({'MSYSTEM': input.msystem}, process.env)}, 'pacboy');
+      await pacman(['-S', '--needed'].concat(input.pacboy), {}, 'pacboy');
       core.endGroup();
     }
 
     if (input.bitness === "32") {
       core.startGroup('Killing remaining tasks...');
       await killMsysProcs(input);
-      changeGroup('autorebase.bat...');
+      core.endGroup();
+
+      core.startGroup('autorebase.bat...');
       await exec.exec(path.join(msysRootDir, "autorebase.bat"));
       core.endGroup();
     }
 
+    // XXX: ideally this should be removed, we don't want to pollute the user's environment
     core.exportVariable('MSYSTEM', input.msystem);
 
-    if (!cachedInstall) {
+    if (!cachedInstall && packageCache !== null) {
       core.startGroup('Saving package cache...');
       await packageCache.prune();
       await packageCache.save();
@@ -364,7 +483,9 @@ async function run() {
 
     if (instCache !== null) {
       core.startGroup('Saving environment...');
-      await packageCache.clear();
+      if (packageCache !== null) {
+        await packageCache.clear();
+      }
       await instCache.save();
       core.endGroup();
     }
