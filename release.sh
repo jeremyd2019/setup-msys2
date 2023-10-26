@@ -15,9 +15,9 @@ GIT_SHA="$(git rev-parse HEAD)"
 GIT_ORIGIN="$(git config --get remote.origin.url)"
 
 # build
-rm -Rf node_modules
-npm ci
-npm run pkg
+#rm -Rf node_modules
+#npm ci
+#npm run pkg
 
 # add new release to dist branch and tag it
 rm -Rf release
@@ -31,5 +31,5 @@ git config --local user.email "$GIT_EMAIL"
 git config --local user.name "$GIT_USER"
 git commit -a -m "$1 $GIT_SHA"
 git tag "$1"
-git tag -d "v2"
-git tag "v2"
+git tag -d "$2"
+git tag "$2"

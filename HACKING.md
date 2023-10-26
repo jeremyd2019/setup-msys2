@@ -6,8 +6,11 @@ The steps to publish a new release are the following:
 # Remove/clean everything
 git clean -xfd
 
+npm ci
+npm run pkg
+
 # Create a clone of this repo under "release" with all the new commits/tags
-./release.sh v2.x.x
+./release.sh v2.x.x v2
 
 # Review and push to the remote
 cd release
