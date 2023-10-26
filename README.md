@@ -62,7 +62,7 @@ In order to reduce verbosity, it is possible to set `msys2` as the default shell
       install: >-
         curl
         git
-  - uses: actions/checkout@v3
+  - uses: actions/checkout@v4
 ```
 
 ### Build matrix
@@ -221,7 +221,7 @@ The package or list of packages are installed through `pacboy --noconfirm -S --n
 
 * Type: `string`
 * Allowed values: `warn | fatal`
-* Default: `warn`
+* Default: `fatal`
 
 By default (`fatal`), throw an error if the runner OS is not Windows.
 If set to `warn`, simply log a message and skip the rest:
@@ -311,5 +311,5 @@ To work around this issue disable the auto conversion before running `actions/ch
 ```yaml
   steps:
   - run: git config --global core.autocrlf input
-  - uses: actions/checkout@v3
+  - uses: actions/checkout@v4
 ```
