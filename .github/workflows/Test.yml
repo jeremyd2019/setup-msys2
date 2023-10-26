@@ -13,7 +13,7 @@ jobs:
     runs-on: windows-latest
     steps:
     - name: 🧰 Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     - run: |
         npm ci
         npm run lint
@@ -22,7 +22,7 @@ jobs:
     runs-on: windows-latest
     steps:
     - name: 🧰 Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     - name: 🚧 build action
       shell: bash
       run: |
@@ -50,7 +50,7 @@ jobs:
     runs-on: windows-latest
     steps:
     - name: 🧰 Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     - name: 📥 Download artifact
       uses: actions/download-artifact@v3
       with:
@@ -88,7 +88,7 @@ jobs:
     runs-on: windows-latest
     steps:
     - name: 🧰 Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     - name: 📥 Download artifact
       uses: actions/download-artifact@v3
       with:
@@ -132,7 +132,7 @@ jobs:
     runs-on: windows-latest
     steps:
     - name: 🧰 Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     - name: 📥 Download artifact
       uses: actions/download-artifact@v3
       with:
@@ -170,7 +170,7 @@ jobs:
     runs-on: windows-latest
     steps:
     - name: 🧰 Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     - name: 📥 Download artifact
       uses: actions/download-artifact@v3
       with:
@@ -188,7 +188,7 @@ jobs:
     steps:
     - uses: actions/setup-go@v4
     - name: 🧰 Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     - name: 📥 Download artifact
       uses: actions/download-artifact@v3
       with:
@@ -206,7 +206,7 @@ jobs:
     steps:
     - uses: actions/setup-go@v4
     - name: 🧰 Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     - name: 📥 Download artifact
       uses: actions/download-artifact@v3
       with:
@@ -229,7 +229,7 @@ jobs:
     runs-on: windows-latest
     steps:
     - name: 🧰 Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     - name: 📥 Download artifact
       uses: actions/download-artifact@v3
       with:
@@ -254,7 +254,7 @@ jobs:
     - run: git config --global core.autocrlf input
       shell: bash
     - name: 🧰 Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
     - name: 📥 Download artifact
@@ -277,7 +277,7 @@ jobs:
         shell: msys2 {0}
     steps:
     - name: 🧰 Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
     - name: 📥 Download artifact
@@ -297,7 +297,7 @@ jobs:
     runs-on: windows-latest
     steps:
     - name: 🧰 Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     - name: 📥 Download artifact
       uses: actions/download-artifact@v3
       with:
@@ -315,7 +315,7 @@ jobs:
     runs-on: windows-latest
     steps:
     - name: 🧰 Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     - name: 📥 Download artifact
       uses: actions/download-artifact@v3
       with:
@@ -335,7 +335,7 @@ jobs:
     runs-on: windows-latest
     steps:
     - name: 🧰 Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     - name: 📥 Download artifact
       uses: actions/download-artifact@v3
       with:
@@ -356,7 +356,7 @@ jobs:
     runs-on: windows-latest
     steps:
     - name: 🧰 Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     - name: 📥 Download artifact
       uses: actions/download-artifact@v3
       with:
@@ -384,7 +384,7 @@ jobs:
     runs-on: ${{ matrix.platform }}-latest
     steps:
     - name: 🧰 Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     - name: 📥 Download artifact
       uses: actions/download-artifact@v3
       with:
@@ -407,7 +407,7 @@ jobs:
         - D:\some\arbitrary
     steps:
     - name: 🧰 Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     - name: 📥 Download artifact
       uses: actions/download-artifact@v3
       with:
@@ -440,7 +440,7 @@ jobs:
       min: ${{ steps.min.outputs.jobs }}
     steps:
     - name: 🧰 Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     - id: all
       uses: ./matrix
     - id: min
@@ -459,7 +459,7 @@ jobs:
     runs-on: windows-latest
     steps:
     - name: 🧰 Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     - name: 📥 Download artifact
       uses: actions/download-artifact@v3
       with:
@@ -482,7 +482,7 @@ jobs:
     runs-on: windows-latest
     steps:
     - name: 🧰 Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     - name: 📥 Download artifact
       uses: actions/download-artifact@v3
       with:
@@ -506,7 +506,7 @@ jobs:
         include: ${{ fromJson(needs.matrix.outputs.min) }}
     steps:
     - name: 🧰 Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     - name: 📥 Download artifact
       uses: actions/download-artifact@v3
       with:
@@ -534,7 +534,7 @@ jobs:
         include: ${{ fromJson(needs.matrix.outputs.min) }}
     steps:
     - name: 🧰 Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     - name: 📥 Download artifact
       uses: actions/download-artifact@v3
       with:
