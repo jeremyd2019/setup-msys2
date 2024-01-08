@@ -125,6 +125,7 @@ async function computeChecksum(filePath) {
 }
 
 /**
+ * @param {Input} input
  * @returns {Promise<string>}
  */
 async function downloadInstaller(input) {
@@ -334,6 +335,9 @@ async function pacman(args, opts, cmd) {
   await runMsys([cmd ? cmd : 'pacman', '--noconfirm'].concat(args), opts);
 }
 
+/**
+ * @param {Input} input
+ */
 async function killMsysProcs(input) {
   if (input.bitness === "32" && process.env['PROCESSOR_ARCHITECTURE'] !== "x86") {
     // taskkill doesn't work on 32-bit processes on 64-bit windows
