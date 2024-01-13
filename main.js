@@ -23,9 +23,9 @@ const INSTALLER_CHECKSUM = 'dba7e6d27e6a9ab850f502da44f6bfcd16d4d7b175fc2b25bee3
 // see https://github.com/msys2/setup-msys2/issues/61
 const INSTALL_CACHE_ENABLED = false;
 const CACHE_FLUSH_COUNTER = 0;
-const INSTALLER32_VERSION = '2023-10-26';
+const INSTALLER32_VERSION = '2024-01-13';
 const INSTALLER32_URL = `https://github.com/jeremyd2019/msys2-installer/releases/download/${INSTALLER32_VERSION}-build32/msys2-base-i686-${INSTALLER32_VERSION.replace(/-/g, '')}.sfx.exe`;
-const INSTALLER32_CHECKSUM = '86071308ffbf0fd151e9533e726b15e28a4aa2a55f248c983a3d707b0ad13fff';
+const INSTALLER32_CHECKSUM = '8d57bf906d4960d4f72b8098eaa1a31693eb44ea52f52a625fa03fe6959e13c9';
 
 class Input {
 
