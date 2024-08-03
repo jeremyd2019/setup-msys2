@@ -403,6 +403,7 @@ async function run() {
     await io.mkdirP(pathDir);
     writeWrapper(msysRootDir, input.msystem, input.pathtype, pathDir, 'msys2.cmd');
     core.addPath(pathDir);
+    core.setOutput('msys2-location', msysRootDir);
 
     const packageCache = input.cache ? new PackageCache(msysRootDir, input) : null;
 
