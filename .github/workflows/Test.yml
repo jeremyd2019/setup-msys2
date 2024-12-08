@@ -14,6 +14,8 @@ jobs:
     steps:
     - name: 🧰 Checkout
       uses: actions/checkout@v4
+      with:
+        persist-credentials: false
     - run: |
         npm ci
         npm run lint
@@ -24,6 +26,8 @@ jobs:
     steps:
     - name: 🧰 Checkout
       uses: actions/checkout@v4
+      with:
+        persist-credentials: false
     - name: 🚧 build action
       shell: bash
       run: |
@@ -52,6 +56,8 @@ jobs:
     steps:
     - name: 🧰 Checkout
       uses: actions/checkout@v4
+      with:
+        persist-credentials: false
     - name: 📥 Download artifact
       uses: actions/download-artifact@v4
       with:
@@ -90,6 +96,8 @@ jobs:
     steps:
     - name: 🧰 Checkout
       uses: actions/checkout@v4
+      with:
+        persist-credentials: false
     - name: 📥 Download artifact
       uses: actions/download-artifact@v4
       with:
@@ -134,6 +142,8 @@ jobs:
     steps:
     - name: 🧰 Checkout
       uses: actions/checkout@v4
+      with:
+        persist-credentials: false
     - name: 📥 Download artifact
       uses: actions/download-artifact@v4
       with:
@@ -172,6 +182,8 @@ jobs:
     steps:
     - name: 🧰 Checkout
       uses: actions/checkout@v4
+      with:
+        persist-credentials: false
     - name: 📥 Download artifact
       uses: actions/download-artifact@v4
       with:
@@ -190,6 +202,8 @@ jobs:
     - uses: actions/setup-go@v5
     - name: 🧰 Checkout
       uses: actions/checkout@v4
+      with:
+        persist-credentials: false
     - name: 📥 Download artifact
       uses: actions/download-artifact@v4
       with:
@@ -208,6 +222,8 @@ jobs:
     - uses: actions/setup-go@v5
     - name: 🧰 Checkout
       uses: actions/checkout@v4
+      with:
+        persist-credentials: false
     - name: 📥 Download artifact
       uses: actions/download-artifact@v4
       with:
@@ -231,6 +247,8 @@ jobs:
     steps:
     - name: 🧰 Checkout
       uses: actions/checkout@v4
+      with:
+        persist-credentials: false
     - name: 📥 Download artifact
       uses: actions/download-artifact@v4
       with:
@@ -258,6 +276,7 @@ jobs:
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
+        persist-credentials: false
     - name: 📥 Download artifact
       uses: actions/download-artifact@v4
       with:
@@ -281,6 +300,7 @@ jobs:
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
+        persist-credentials: false
     - name: 📥 Download artifact
       uses: actions/download-artifact@v4
       with:
@@ -299,6 +319,8 @@ jobs:
     steps:
     - name: 🧰 Checkout
       uses: actions/checkout@v4
+      with:
+        persist-credentials: false
     - name: 📥 Download artifact
       uses: actions/download-artifact@v4
       with:
@@ -317,6 +339,8 @@ jobs:
     steps:
     - name: 🧰 Checkout
       uses: actions/checkout@v4
+      with:
+        persist-credentials: false
     - name: 📥 Download artifact
       uses: actions/download-artifact@v4
       with:
@@ -337,6 +361,8 @@ jobs:
     steps:
     - name: 🧰 Checkout
       uses: actions/checkout@v4
+      with:
+        persist-credentials: false
     - name: 📥 Download artifact
       uses: actions/download-artifact@v4
       with:
@@ -358,6 +384,8 @@ jobs:
     steps:
     - name: 🧰 Checkout
       uses: actions/checkout@v4
+      with:
+        persist-credentials: false
     - name: 📥 Download artifact
       uses: actions/download-artifact@v4
       with:
@@ -386,6 +414,8 @@ jobs:
     steps:
     - name: 🧰 Checkout
       uses: actions/checkout@v4
+      with:
+        persist-credentials: false
     - name: 📥 Download artifact
       uses: actions/download-artifact@v4
       with:
@@ -410,6 +440,8 @@ jobs:
     steps:
     - name: 🧰 Checkout
       uses: actions/checkout@v4
+      with:
+        persist-credentials: false
     - name: 📥 Download artifact
       uses: actions/download-artifact@v4
       with:
@@ -424,14 +456,18 @@ jobs:
       run: |
         cygpath -m /
     - shell: pwsh
+      env:
+        MSYS2_LOCATION: ${{ steps.msys2.outputs.msys2-location }}
       run: |
-        echo '${{ steps.msys2.outputs.msys2-location }}'
+        echo "$env:MSYS2_LOCATION"
     - shell: pwsh
+      env:
+        MSYS2_LOCATION: ${{ steps.msys2.outputs.msys2-location }}
       run: |
         $Env:MSYS2_ROOT = msys2 -c 'cygpath -a -w /'
         $Env:MSYS2_ROOT
-        if ($env:MSYS2_ROOT -ne '${{ steps.msys2.outputs.msys2-location }}') {
-            Write-Error "Error: MSYS2_ROOT is '$env:MSYS2_ROOT', expected '${{ steps.msys2.outputs.msys2-location }}'"
+        if ($env:MSYS2_ROOT -ne "$env:MSYS2_LOCATION") {
+            Write-Error "Error: MSYS2_ROOT is '$env:MSYS2_ROOT', expected '$env:MSYS2_LOCATION'"
             exit 1
         }
     - shell: python
@@ -451,6 +487,8 @@ jobs:
     steps:
     - name: 🧰 Checkout
       uses: actions/checkout@v4
+      with:
+        persist-credentials: false
     - id: all
       uses: ./matrix
     - id: min
@@ -470,6 +508,8 @@ jobs:
     steps:
     - name: 🧰 Checkout
       uses: actions/checkout@v4
+      with:
+        persist-credentials: false
     - name: 📥 Download artifact
       uses: actions/download-artifact@v4
       with:
@@ -493,6 +533,8 @@ jobs:
     steps:
     - name: 🧰 Checkout
       uses: actions/checkout@v4
+      with:
+        persist-credentials: false
     - name: 📥 Download artifact
       uses: actions/download-artifact@v4
       with:
@@ -517,6 +559,8 @@ jobs:
     steps:
     - name: 🧰 Checkout
       uses: actions/checkout@v4
+      with:
+        persist-credentials: false
     - name: 📥 Download artifact
       uses: actions/download-artifact@v4
       with:
@@ -545,6 +589,8 @@ jobs:
     steps:
     - name: 🧰 Checkout
       uses: actions/checkout@v4
+      with:
+        persist-credentials: false
     - name: 📥 Download artifact
       uses: actions/download-artifact@v4
       with:
