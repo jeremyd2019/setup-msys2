@@ -7,6 +7,9 @@ on:
     - cron: '0 0 * * 3'
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
 
   matrix:
@@ -22,7 +25,6 @@ jobs:
           mingw32
           mingw64
           ucrt64
-          clang32
           clang64
 
   msys2:
