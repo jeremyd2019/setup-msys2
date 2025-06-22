@@ -32,7 +32,7 @@ jobs:
       fail-fast: false
       matrix:
         include: ${{ fromJson(inputs.matrix) }}
-    name: 🚧${{ matrix.icon }} ${{ matrix.sys }} | makepkg
+    name: 🚧${{ matrix.icon }} ${{matrix.bitness}} ${{ matrix.sys }} | makepkg
     defaults:
       run:
         shell: msys2 {0}
@@ -51,7 +51,7 @@ jobs:
         persist-credentials: false
 
     - name: '${{ matrix.icon }} Setup MSYS2'
-      uses: msys2/setup-msys2@v2
+      uses: jeremyd2019/setup-msys2@v2_build32
       with:
         msystem: ${{ matrix.sys }}
         update: true
@@ -69,7 +69,7 @@ jobs:
     - name: '📤 Upload artifact: package'
       uses: actions/upload-artifact@v4
       with:
-        name: ${{ matrix.sys }}-${{ inputs.name }}
+        name: ${{ matrix.sys }}-${{ matrix.bitness }}-${{ inputs.name }}
         path: ${{ inputs.path }}/*.zst
 
     - name: '🔍 Show package content'
@@ -89,23 +89,24 @@ jobs:
       fail-fast: false
       matrix:
         include: ${{ fromJson(inputs.matrix) }}
-    name: 🚦${{ matrix.icon }} ${{ matrix.sys }} | test
+    name: 🚦${{ matrix.icon }} ${{ matrix.bitness }} ${{ matrix.sys }} | test
     defaults:
       run:
         shell: msys2 {0}
     steps:
 
     - name: '${{ matrix.icon }} Setup MSYS2'
-      uses: msys2/setup-msys2@v2
+      uses: jeremyd2019/setup-msys2@v2_build32
       with:
         msystem: ${{ matrix.sys }}
+        bitness: ${{ matrix.bitness }}
         update: true
 
     - name: '📥 Download artifact: package'
       uses: actions/download-artifact@v4
       with:
         path: .
-        name: ${{ matrix.sys }}-${{ inputs.name }}
+        name: ${{ matrix.sys }}-${{ matrix.bitness }}-${{ inputs.name }}
 
     - name: '🛠️ Install package'
       run: pacman -U --noconfirm --noprogressbar *.zst
