@@ -55,6 +55,7 @@ jobs:
       with:
         msystem: ${{ matrix.sys }}
         update: true
+        bitness: ${{ matrix.bitness }}
         install: git base-devel tree
         pacboy: toolchain:p
 
