@@ -16,9 +16,9 @@ function dummy() {
     return [__dirname + '/action.yml', __dirname + '/README.md'];
 }
 
-const INSTALLER_VERSION = '2025-06-22';
+const INSTALLER_VERSION = '2025-08-30';
 const INSTALLER_URL = `https://github.com/msys2/msys2-installer/releases/download/${INSTALLER_VERSION}/msys2-base-x86_64-${INSTALLER_VERSION.replace(/-/g, '')}.sfx.exe`;
-const INSTALLER_CHECKSUM = 'df6c053891d0b87c9104c118c0ce22885c3bc350a7659958d6d97a6760ccfa76';
+const INSTALLER_CHECKSUM = '1f27d95ca3943272e16102029e6433608cb204068ac9456a510d069be0c02eeb';
 // see https://github.com/msys2/setup-msys2/issues/61
 const INSTALL_CACHE_ENABLED = false;
 const CACHE_FLUSH_COUNTER = 0;
@@ -79,12 +79,6 @@ function parseInput() {
   const platformcheckseverity_allowed = ['fatal', 'warn'];
   if (!platformcheckseverity_allowed.includes(p_platformcheckseverity)) {
     throw new Error(`'platform-check-severity' needs to be one of ${ platformcheckseverity_allowed.join(', ') }, got ${p_platformcheckseverity}`);
-  }
-
-  if ( process.platform === 'win32' && (p_location === 'C:\\' || p_location === 'C:') ) {
-    throw new Error(`'location' cannot be 'C:' because that contains the built-in MSYS2 installation
-      in GitHub Actions environments. See option 'release', in order to use that installation:
-      https://github.com/msys2/setup-msys2#release`);
   }
 
   let input = new Input();
@@ -372,11 +366,16 @@ async function run() {
 
     let cachedInstall = false;
     let instCache = null;
-    let msysRootDir = path.join('C:', `msys${input.bitness}`);
+    let msysRootDir;
+
     if (input.release) {
       // Use upstream package instead of the default installation in the virtual environment.
       let dest = (input.location) ? input.location : tmp_dir;
       msysRootDir = path.join(dest, `msys${input.bitness}`);
+      if (fs.existsSync(msysRootDir)) {
+        core.setFailed(`Trying to install MSYS2 to ${msysRootDir} but that already exists, cannot continue.`);
+        return;
+      }
       await io.mkdirP(msysRootDir);
       if (INSTALL_CACHE_ENABLED) {
         instCache = new InstallCache(msysRootDir, input);
@@ -397,6 +396,13 @@ async function run() {
         await disableKeyRefresh(msysRootDir);
         core.endGroup();
       }
+    } else {
+        msysRootDir = path.join('C:', `msys${input.bitness}`);
+    }
+
+    if (!fs.existsSync(msysRootDir)) {
+      core.setFailed(`MSYS2 installation not found at ${msysRootDir}, cannot continue.`)
+      return;
     }
 
     const pathDir = path.join(tmp_dir, 'setup-msys2');

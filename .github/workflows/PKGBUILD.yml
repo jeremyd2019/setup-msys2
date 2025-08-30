@@ -45,13 +45,18 @@ jobs:
       shell: bash
 
     - name: '🧰 Checkout'
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         fetch-depth: 0
         persist-credentials: false
 
+    - name: 📥 Download artifact
+      uses: actions/download-artifact@v5
+      with:
+        name: action
+
     - name: '${{ matrix.icon }} Setup MSYS2'
-      uses: msys2/setup-msys2@v2
+      uses: ./
       with:
         msystem: ${{ matrix.sys }}
         update: true
@@ -94,14 +99,19 @@ jobs:
         shell: msys2 {0}
     steps:
 
+    - name: 📥 Download artifact
+      uses: actions/download-artifact@v5
+      with:
+        name: action
+
     - name: '${{ matrix.icon }} Setup MSYS2'
-      uses: msys2/setup-msys2@v2
+      uses: ./
       with:
         msystem: ${{ matrix.sys }}
         update: true
 
     - name: '📥 Download artifact: package'
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v5
       with:
         path: .
         name: ${{ matrix.sys }}-${{ inputs.name }}
